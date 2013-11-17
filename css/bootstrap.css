@@ -2746,6 +2746,12 @@ input[type="button"].btn-block {
   src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../fonts/glyphicons-halflings-regular.woff') format('woff'), url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
 
+@font-face
+{
+font-family: ChunkFive;
+src: url(../fonts/ChunkFive/ChunkFive.otf);
+}
+
 .glyphicon {
   position: relative;
   top: 1px;
@@ -4768,23 +4774,28 @@ textarea.input-group-sm > .input-group-btn > .btn {
   border-width: 0 0 1px;
 }
 
+
 .navbar-fixed-bottom {
   bottom: 0;
   margin-bottom: 0;
   border-width: 1px 0 0;
 }
 
+#navbar-title {
+	color: #00bf5f;
+	font-family: ChunkFive;
+}
 .navbar-brand {
   float: left;
   padding: 19.5px 15px;
-  font-size: 26px;
+  font-size: 46px;
   line-height: 21px;
-  color: #5bb75b;
 }
 
 .navbar-brand:hover,
 .navbar-brand:focus {
   text-decoration: none;
+  color: #ffffff;
 }
 
 @media (min-width: 768px) {

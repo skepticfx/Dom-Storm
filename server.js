@@ -21,15 +21,19 @@ my_http.createServer(function(request,response){
 	}
 	
 	*/
-	
+	console.log(pathname);
 	switch(pathname){
 	case "/":
 		my_path = "index.html";
 		break;
-	case "/api":
+	case "/api/":
 		handlers.api(query, response);
 		return;
-		break;		
+		break;	
+	case "/modules/":
+		handlers.route_modules(query, response);
+		return;
+		break;			
 	default:	
 		my_path = url.parse(request.url).pathname;
 		break;
@@ -82,6 +86,19 @@ my_http.createServer(function(request,response){
 						case "tiff":
 							response.writeHeader(200,{"Content-Type": "image/tiff"} );  
 							break;
+						case "ttf":
+							response.writeHeader(200,{"Content-Type": "application/x-font-ttf"} );  
+							break;
+						case "otf":
+							response.writeHeader(200,{"Content-Type": "font/opentype"} );  
+							break;
+						case "eot":
+							response.writeHeader(200,{"Content-Type": "application/vnd.ms-fontobject"} );  
+							break;
+						case "woff":
+							response.writeHeader(200,{"Content-Type": "font/x-woff"} );  
+							break;							
+
 						default:
 							response.writeHeader(200,{"Content-Type": "text/html"} );
 							break;
