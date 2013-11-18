@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+Document.domain Testing
+</title>
+<script type="text/javascript" src="/js/results.js"> </script>
+</head>
+
+<body>
+<textarea id="user_script" style="display:none;">
+// User script
+
+// Hooks the getter of Obj.prop
+function hook(Obj, prop, newValue){
+	Object.defineProperty(Obj, prop, {
+		'get': function(){ return newValue;}
+	});
+}
+
+var before = document.domain;
+hook(document, 'domain', 'changed.com');
+var after = document.domain;
+
+if(	before == after){
+	alert('Not Changed');
+} else {
+	alert('Changed');
+}
+
+</textarea>
+
+<h1>Document.domain Testing</h1>
+<script>
+function newIframe(){
+	var iframe = document.createElement('iframe');
+	iframe.src = "/pages/iframe.html";
+	document.body.appendChild(iframe);
+return iframe;
+}
+
+function removeMe(node){
+	return node.parentNode.removeChild(node);
+}
+
+function injectScript(iframe, userScript){
+	var inject = "<h1>Injected Script</h1><scri"+''+"pt>" + userScript + "</scri"+''+"pt>";
+	iframe.contentWindow.document.write(inject);
+}
+
+var new_iframe = newIframe();
+var userScript = document.getElementById('user_script').innerHTML;
+injectScript(new_iframe, userScript);
+
+
+</script>
+
+</body>
+</html>
