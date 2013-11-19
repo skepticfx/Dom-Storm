@@ -9,24 +9,45 @@ Document.domain Testing
 
 <body>
 <textarea id="user_script" style="display:none;">
-// User script
 
+// User script
 // Hooks the getter of Obj.prop
+
+
 function hook(Obj, prop, newValue){
+console.log(Obj,typeof Obj, prop);
+try{
 	Object.defineProperty(Obj, prop, {
 		'get': function(){ return newValue;}
 	});
+}	
+	
+catch(err){
+	alert(err, Obj, prop);
+}
+	
 }
 
-var before = document.domain;
-hook(document, 'domain', 'changed.com');
-var after = document.domain;
+function test(Obj,prop){
+	var before = Obj[prop];
+	hook(Obj, prop, 'xyz);
+	var after = Obj[prop];
 
-if(	before == after){
-	alert('Not Changed');
-} else {
-	alert('Changed');
+	if(	before == after){
+		alert(Obj + ' . '+ prop +' Not Changed');
+	} else {
+		alert(Obj + ' . '+ prop +' Changed');
+	}
 }
+
+var data = [[document, 'domain'], [window.document, 'location'], [location, 'href']];
+var i=0;
+for(i=0; i<data.length; i++){
+	test(data[i][0], data[i][1]);
+}
+
+
+
 
 </textarea>
 
@@ -49,7 +70,7 @@ function injectScript(iframe, userScript){
 }
 
 var new_iframe = newIframe();
-var userScript = document.getElementById('user_script').innerHTML;
+var userScript = document.getElementById('user_script').innerText;
 injectScript(new_iframe, userScript);
 
 
