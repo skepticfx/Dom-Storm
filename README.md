@@ -6,7 +6,7 @@ A framework for testing anything Document Object Model (DOM). Use it to check, h
 This project is pre-alpha. Nothing may work now. I'm spending my time to make sure that, I give the word 'Framework' some real meaning.
 
 
-![logo](https://raw.github.com/skepticfx/Dom-Storm/master/imgs/dom-storm-logo.png)
+![logo](https://raw.github.com/skepticfx/Dom-Storm/master/public/imgs/dom-storm-logo.png)
 
 ###### TODO
 
