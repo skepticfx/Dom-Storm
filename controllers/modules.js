@@ -1,7 +1,9 @@
+// Routes for anything '/modules' related
 
-var path = require('path');
+var fs = require('fs');
 
-exports.set = function(app){
+// Loads the module home and individual modules
+exports.index = function(app){
 
 	app.get('/modules', function(req, res){
 		if(typeof req.query.id != 'undefined'){
@@ -17,6 +19,28 @@ exports.set = function(app){
 		} else {
 			res.render('modules/index', {'title': 'Modules'});	
 		}
+	});
+
+}
+
+// Creates a new module
+exports.create = function(app){
+	// Should be made post.
+	app.get('/modules/create', function(req, res){
+		app.render('modules/createModule', {
+		'module_path': '/test_modules/new',
+		'module_name': 'someName',
+		'module_description': 'someDescription',
+		'module_results': {'state' : 'NOT_STARTED'},
+		'module_userScript': 'var a;'
+		}, function(err, html){
+			fs.writeFile(process.cwd()+'/models/core/modules/someName.js', html, function (err) {
+			if (err) throw err;
+			console.log('It\'s saved!');
+			res.end('Good Boy');
+			});
+		});
+		
 	});
 
 }

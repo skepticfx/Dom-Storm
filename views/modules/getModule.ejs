@@ -19,10 +19,13 @@
 			</div>
 			<div class="panel-body">
 				<% if(module_results.state == "NOT_STARTED"){ %>
-				The scan has not been started yet.
-				<% } else { %>
+				This module appears to be new to the system. Please run the test, to view the results.
+				<% } if(module_results.state == "ERROR"){ %>
+				The last time this module was run, it ran in to an error. Please re-run the test to get some results. And yea, Good Luck with that.
+				<% } if(module_results.state == "COMPLETED"){%>
 				<%= module_results %>
-				<%	} %>
+				<% } %>
+				
 			</div>
 		</div>
 	</div>

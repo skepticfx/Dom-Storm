@@ -13,7 +13,7 @@ var MODULE_DESCRIPTION = "Checks whether document.domain can be overridden from 
 
 // User can call this in the script
 var results = {};
-results.state = 'NOT_STARTED';
+results.state = 'NOT_STARTED'; // ERROR, COMPLETE
 
 
 // Where the user really writes a scanner.

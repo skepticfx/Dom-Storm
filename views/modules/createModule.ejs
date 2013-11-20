@@ -1,0 +1,43 @@
+
+
+// <%= module_path %>.js 
+console.log("<%= module_name %> called");
+
+// Global variables to be set.
+
+var MODULE_NAME = "<%= module_name %>";
+var MODULE_DESCRIPTION = "<%= module_description %>";
+
+// Has to come from DB.
+
+// Library
+
+
+// User can call this in the script
+var results = {};
+results.state = '<%= module_results.state %>'; // ERROR, COMPLETE
+results.code = 'success';
+
+// This is the userScript which the Module Creator gives.
+// We have this inside an function with a closure
+
+try{
+	var userScript = function(){
+		
+
+	<%= module_userScript %>
+
+	}
+
+}
+
+catch(err){
+	results.code = 'error';
+}
+
+exports = module.exports = { 
+	results: results, 
+	name: MODULE_NAME.toString(), 
+	description: MODULE_DESCRIPTION.toString()
+
+};
