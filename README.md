@@ -29,5 +29,5 @@ This project is pre-alpha. Nothing may work now. I'm spending my time to make su
 
 ###### Modules used
 
-* node-boilerstrap, which uses Bootstrap and Flatly theme.
+* Express, Flatly
 

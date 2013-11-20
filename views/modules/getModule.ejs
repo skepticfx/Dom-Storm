@@ -1,0 +1,41 @@
+<% include ../layouts/header.ejs %>
+<% include ../layouts/navbar.ejs %>
+
+<div class="container">
+
+<div class="jumbotron"> 
+<center>
+			<h1><%= module_name %></h1>
+			<p><%= module_description %></p>
+</center>
+</div>
+
+
+  <div class="col-lg-12">      
+	<div class="row">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">Results</h3>
+			</div>
+			<div class="panel-body">
+				<% if(module_results.state == "NOT_STARTED"){ %>
+				The scan has not been started yet.
+				<% } else { %>
+				<%= module_results %>
+				<%	} %>
+			</div>
+		</div>
+	</div>
+	  
+	<div class="row">
+		<form id="test-form" action="" target="_blank" method="GET">
+		<p><a class="btn btn-danger" onClick="document.getElementById('test-form').submit();">Run Test</a></p>
+		</form>
+	</div>  
+
+</div>
+
+</div><!-- /.container -->
+
+
+<% include ../layouts/footer.ejs %>
