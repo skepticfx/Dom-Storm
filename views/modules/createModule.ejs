@@ -28,13 +28,13 @@
 		<div class="col-lg-10">
 		  <div class="radio">
 			<label>
-			  <input type="radio" name="_type" id="optionsRadios1" value="ENUM_FUNCTION" checked="">
+			  <input type="radio" name="_module_type" id="optionsRadios1" value="ENUM_FUNCTION" checked="">
 			  Enumeration Functions
 			</label>
 		  </div>
 		  <div class="radio">
 			<label>
-			  <input type="radio" name="_type" id="optionsRadios2" value="FUZZER">
+			  <input type="radio" name="_module_type" id="optionsRadios2" value="FUZZER">
 			  Fuzzer
 			</label>
 		  </div>
@@ -42,12 +42,42 @@
 	  </div>
 
 	  <div class="form-group">
+		<label class="col-lg-2 control-label">Results Type</label>
+		<div class="col-lg-10">
+		  <div class="radio">
+			<label>
+			  <input type="radio" name="_results_type" id="optionsRadios1" value="SIMPLE_TABLE" checked="">
+			  Simple Table Format
+			</label>
+		  </div>
+		  <div class="radio">
+			<label>
+			  <input type="radio" name="_results_type" id="optionsRadios2" value="ENUM_LIST">
+			  Enumeration List
+			</label>
+		  </div>
+		</div>
+	  </div>	  
+	  
+	  <div class="form-group">
 		<label for="userScript" class="col-lg-2 control-label">User Script</label>
 		<div class="col-lg-10">
 		  <textarea name="_userScript" class="form-control" rows="7" id="userScript"></textarea>
 		  <span class="help-block">Come up with your own script to do a Enumeration Function scan. Read more <u>here</u></span>
 		</div>
 	  </div>	  
+
+	  <div class="form-group">
+		<label for="userScript" class="col-lg-2 control-label">Enumeration Data</label>
+		<div class="col-lg-10">
+		  <textarea name="_enum_data" class="form-control" rows="3" id="enum_data"></textarea>
+		  <span class="help-block">Specify your Enumeration Data here as a code. 
+			  <code>
+			  var data = [['window', 'postMessage.name'], ['document', 'domain']];
+			  </code>
+		  </span>
+		</div>
+	  </div>	
 	  
 	  <div class="form-group">
 		<div class="col-lg-10 col-lg-offset-2">

@@ -1,7 +1,7 @@
 // Routes for anything '/modules' related
-//528d5206a81f151412000002
+//528dd7c1c6bbedf415000002
 var fs = require('fs');
-var Modules = require(process.cwd()+'/models/db/mongo.js').Modules;
+var Modules = require(process.cwd()+'/models/Modules.js').Modules;
 
 // Loads the module home and individual modules
 exports.index = function(app){
@@ -55,7 +55,7 @@ exports.run = function(app){
 				break;
 				
 				default:
-				res.render('misc/error', {'info': 'The Test Type is not function yet'});
+				res.render('misc/error', {'info': 'The Test Type is not defined yet'});
 				}
 			});
 		} else {
@@ -77,27 +77,53 @@ exports.create = function(app){
 	// Form
 	app.post('/modules/create', function(req, res){
 		var results = {};
-		results.type = 'SIMPLE_TABLE';
+		results.type = req.body._results_type;
 		var test = {};
 		test.state = 'NOT_STARTED'; // ERROR, COMPLETE
-		test.type = req.body._type;
+		test.type = req.body._module_type;
 		test.userScript = req.body._userScript;
+		test.enum_data = req.body._enum_data;
 
-		var newObj = {};
-		newObj.results = results;
-		newObj.test = test;
-		newObj.name = req.body._name;
-		newObj.description = req.body._desc;
+		var newModule = {};
+		newModule.results = results;
+		newModule.test = test;
+		newModule.name = req.body._name;
+		newModule.description = req.body._desc;
 
-		Modules.add(newObj, function(err, obj){
+		Modules.add(newModule, function(err, module){
 			if(err){
 				res.render('misc/error', {'info': 'Something wrong happened, when we tried creating your new module.'});
 			} else {
-				res.end(obj._id + " Module Successfully created.");
+				res.redirect('/modules/?id='+ module._id);
 			}
 		});
 	});	
 	
 
 
+}
+
+
+
+
+exports.results = function(app){
+
+	// Can be Ajax
+	app.post('/modules/results/update', function(req, res){
+		var module_id = req.body._module_id;
+		var results = {};
+		results.raw = req.body._results_raw;
+		var test = {};
+		test.state = 'COMPLETED'; //  COMPLETE
+
+		Modules.update({'_id': module_id}, {'results.raw': results.raw, 'test.state': test.state},  function(err, result){
+			if(err){
+				res.render('misc/error', {'info': 'Something wrong happened, when we tried creating your new module.'});
+			} else {
+				console.log(result);
+				res.redirect('/modules/?id='+ module._id);
+			}
+		});
+	});	
+	
 }

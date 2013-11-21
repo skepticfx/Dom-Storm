@@ -20,57 +20,28 @@ Testing with IFRAME
 <h1>Testing</h1>
 </body>
 <script>
-// User script
-// This will be dynamically generated from the db
+// Our code
 
-// Hooks the getter of Obj.prop
-
-
-function hook(Obj, prop, newValue){
-try{
-	Object.defineProperty(Obj, prop, {
-		'get': function(){ return newValue;}
-	});
-}	
-	
-catch(err){
-	console.log(err, Obj, prop);
-}
-	
-}
-
-function test(x, y){
-	// We need to separate properties and access one by one.
-	var tmp;
-	var before = this[x];
-	
-	var prop = y.split('.');
-	
-	for(tmp in prop){
-		before = before[prop[tmp]]
-	}
-
-	
-	hook(this[x], y, 'test_xyz_value');
-	var after = this[x];
-	for(tmp in prop){
-		after = after[prop[tmp]]
-	}	
-
-	if(	before == after){
-		console.log(x + '.'+ y +' Not Changed');
-	} else {
-		console.log(x + '.'+ y +' Changed');
-	}
+var addResult = function(){
+	top.window.st.addResult(arguments);
+return;
 }
 
 
+// The userScript for the Module
+
+<%- module_test.userScript %>
+
+// Our code
 
 
 </textarea>
 
 <h1>Testing <%= module_name %> </h1>
 <script>
+
+var st = new simpleTable("Document.domain testing" ,2, [{type: 'string', value: 'Property Tested'}, {type: 'boolean', value: 'Overriding/Hooking allowed?'}]);
+
 var userScript = document.getElementById('user_script').innerText;
 
 function newIframe(injectMe){
@@ -89,7 +60,8 @@ function injectScript(iframe, inject){
 	iframe.contentWindow.document.write(inject);
 }
 
-var data = [['window', 'postMessage.name'], ['document', 'domain'], ['window', 'document.location'], ['location', 'href'], ['document', 'body.innerHTML'], ['document', 'location.origin'], ['window', 'location']];
+// The Enum Data for the given module.
+<%- module_test.enum_data %>
 
 // Type = Data Enumeration using a test Function
 for(x in data){
@@ -100,6 +72,20 @@ for(x in data){
 	test_call += "');";
 	new_iframe = newIframe(userScript+" " + test_call + "</scr" + "ipt></bod"+ "y></htm"+ "l>");
 }
+
+function endTest(){
+	var r = new Results('SIMPLE_TABLE', st);
+	document.body.innerHTML += r.getHTML();
+	
+	var module_id = '<%=module_id%>';
+	var xhr = new XMLHttpRequest();
+	xhr.open('POST', '/modules/results/update', true);
+	xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	xhr.send('_module_id='+module_id+'&_results_raw='+encodeURIComponent(r.getHTML()));
+
+}
+
+setTimeout(endTest, 3000);
 
 </script>
 

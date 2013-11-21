@@ -15,7 +15,6 @@ exports.set = function(app){
 	modules.create(app); // More specific routes comes first.
 	modules.index(app);
 	modules.run(app);
+	modules.results(app);
 
-	
-	
 };

@@ -20,8 +20,8 @@ function simpleTable(title, count, cols_arr){
 	this.columns = cols;
 	this.title = title;
 	this.rows = []; // Initially the rows are empty. This will be a 2D array.
-	this.addResult = function(arr_row){
-		this.rows.push(arr_row);
+	this.addResult = function(result){
+		this.rows.push(result);
 	};
 	
 	// Creates and returns a HTML table format.
@@ -55,3 +55,5 @@ st.addResult(['document.location', 'false', 'Error']);
 var r = new Results('SIMPLE_TABLE', st);
 
 */
+
+

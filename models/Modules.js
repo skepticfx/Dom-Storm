@@ -31,6 +31,7 @@ modulesSchema.statics.add = function(obj, callback){
 	instance.test._type = obj.test.type;
 	instance.test.state = obj.test.state;
 	instance.test.userScript = obj.test.userScript;
+	instance.test.enum_data = obj.test.enum_data;
 	instance.results._type = obj.results.type;
 	
 	instance.save(function (err){

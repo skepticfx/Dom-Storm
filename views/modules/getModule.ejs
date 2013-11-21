@@ -14,7 +14,7 @@
 
   <div class="column">      
 	<div class="column">
-		<div class="panel panel-primary">
+		<div class="panel panel-warning">
 			<div class="panel-heading">
 				<h3 class="panel-title">Results</h3>
 			</div>
@@ -24,7 +24,7 @@
 				<% } if(module_test.state == "ERROR"){ %>
 				The last time this module was run, it ran in to an error. Please re-run the test to get some results. And yea, Good Luck with that.
 				<% } if(module_test.state == "COMPLETED"){%>
-				<%= module_results %>
+				<%- module_results.raw %>
 				<% } %>
 				
 			</div>
@@ -32,7 +32,7 @@
 	</div>
 	
 	<div class="column">
-		<div class="panel panel-success">
+		<div class="panel panel-info">
 			<div class="panel-heading">
 				<h3 class="panel-title">User Script (<%=module_test._type%>) </h3>
 			</div>
@@ -45,7 +45,24 @@
 			</div>
 		</div>
 	</div>	
-	  
+
+	
+	<div class="column">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h3 class="panel-title">Enum Data (<%=module_test._type%>) </h3>
+			</div>
+			<div class="panel-body">
+				<pre>
+					<code>
+<%= module_test.enum_data %>
+					</code>
+				</pre>
+			</div>
+		</div>
+	</div>	
+
+	
 	<div class="column">
 		<form id="test-form" action="/modules/run" target="_blank" method="GET">
 		<input type="hidden" name="id" value="<%= module_id %>"/>
