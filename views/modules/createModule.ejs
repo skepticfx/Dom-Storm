@@ -1,43 +1,62 @@
+<% include ../layouts/header.ejs %>
+<% include ../layouts/navbar.ejs %>
 
 
-// <%= module_path %>.js 
-console.log("<%= module_name %> called");
-
-// Global variables to be set.
-
-var MODULE_NAME = "<%= module_name %>";
-var MODULE_DESCRIPTION = "<%= module_description %>";
-
-// Has to come from DB.
-
-// Library
+<div class="container">  
+	<h1><%= title %></h1>
 
 
-// User can call this in the script
-var results = {};
-results.state = '<%= module_results.state %>'; // ERROR, COMPLETE
-results.code = 'success';
+<div class="well panel-heading">
+  <form class="bs-example form-horizontal" action="/modules/create" method="POST">
+	<fieldset>
+	  <legend>Create a new 'Enum Function' module</legend>
+	  <div class="form-group">
+		<label for="inputName" class="col-lg-2 control-label">Name</label>
+		<div class="col-lg-10">
+		  <input type="text" name="_name" class="form-control" id="inputName" placeholder="Properties of document.window">
+		</div>
+	  </div>
+	  <div class="form-group">
+		<label for="inputDesc" class="col-lg-2 control-label">Description</label>
+		<div class="col-lg-10">
+		  <input type="text" class="form-control" name="_desc" id="inputDesc" placeholder="Lists all the document.window properties">
+		</div>
+	  </div>
 
-// This is the userScript which the Module Creator gives.
-// We have this inside an function with a closure
+	  <div class="form-group">
+		<label class="col-lg-2 control-label">Module Type</label>
+		<div class="col-lg-10">
+		  <div class="radio">
+			<label>
+			  <input type="radio" name="_type" id="optionsRadios1" value="ENUM_FUNCTION" checked="">
+			  Enumeration Functions
+			</label>
+		  </div>
+		  <div class="radio">
+			<label>
+			  <input type="radio" name="_type" id="optionsRadios2" value="FUZZER">
+			  Fuzzer
+			</label>
+		  </div>
+		</div>
+	  </div>
 
-try{
-	var userScript = function(){
-		
-
-	<%= module_userScript %>
-
-	}
-
-}
-
-catch(err){
-	results.code = 'error';
-}
-
-exports = module.exports = { 
-	results: results, 
-	name: MODULE_NAME.toString(), 
-	description: MODULE_DESCRIPTION.toString()
-
-};
+	  <div class="form-group">
+		<label for="userScript" class="col-lg-2 control-label">User Script</label>
+		<div class="col-lg-10">
+		  <textarea name="_userScript" class="form-control" rows="7" id="userScript"></textarea>
+		  <span class="help-block">Come up with your own script to do a Enumeration Function scan. Read more <u>here</u></span>
+		</div>
+	  </div>	  
+	  
+	  <div class="form-group">
+		<div class="col-lg-10 col-lg-offset-2">
+		  <button class="btn btn-default" type="reset">Clear</button> 
+		  <button type="submit" class="btn btn-primary">Submit</button> 
+		</div>
+	  </div>
+	</fieldset>
+  </form>
+</div>			
+</div>
+<% include ../layouts/footer.ejs %>			

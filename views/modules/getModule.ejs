@@ -1,6 +1,7 @@
 <% include ../layouts/header.ejs %>
 <% include ../layouts/navbar.ejs %>
 
+
 <div class="container">
 
 <div class="jumbotron"> 
@@ -11,27 +12,43 @@
 </div>
 
 
-  <div class="col-lg-12">      
-	<div class="row">
+  <div class="column">      
+	<div class="column">
 		<div class="panel panel-primary">
 			<div class="panel-heading">
 				<h3 class="panel-title">Results</h3>
 			</div>
 			<div class="panel-body">
-				<% if(module_results.state == "NOT_STARTED"){ %>
+				<% if(module_test.state == "NOT_STARTED"){ %>
 				This module appears to be new to the system. Please run the test, to view the results.
-				<% } if(module_results.state == "ERROR"){ %>
+				<% } if(module_test.state == "ERROR"){ %>
 				The last time this module was run, it ran in to an error. Please re-run the test to get some results. And yea, Good Luck with that.
-				<% } if(module_results.state == "COMPLETED"){%>
+				<% } if(module_test.state == "COMPLETED"){%>
 				<%= module_results %>
 				<% } %>
 				
 			</div>
 		</div>
 	</div>
+	
+	<div class="column">
+		<div class="panel panel-success">
+			<div class="panel-heading">
+				<h3 class="panel-title">User Script (<%=module_test._type%>) </h3>
+			</div>
+			<div class="panel-body">
+				<pre>
+					<code>
+<%= module_test.userScript %>
+					</code>
+				</pre>
+			</div>
+		</div>
+	</div>	
 	  
-	<div class="row">
-		<form id="test-form" action="" target="_blank" method="GET">
+	<div class="column">
+		<form id="test-form" action="/modules/run" target="_blank" method="GET">
+		<input type="hidden" name="id" value="<%= module_id %>"/>
 		<p><a class="btn btn-danger" onClick="document.getElementById('test-form').submit();">Run Test</a></p>
 		</form>
 	</div>  
@@ -39,6 +56,7 @@
 </div>
 
 </div><!-- /.container -->
+
 
 
 <% include ../layouts/footer.ejs %>

@@ -2,6 +2,9 @@
 
 /*! normalize.css v2.1.3 | MIT License | git.io/normalize */
 
+.center-x{ text-align:center; } 
+.center-y{ vertical-align:middle; }
+
 article,
 aside,
 details,

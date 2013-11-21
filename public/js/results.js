@@ -5,7 +5,6 @@
 // result_object -> an instance of the object 'Type'
 function Results(type, result_object){
 	this.type = type;
-	this.state = 'NOT_STARTED'; // COMPLETED, ERROR
 	this.getHTML = function(){ return result_object.getHTML().toString(); };
 }
 
