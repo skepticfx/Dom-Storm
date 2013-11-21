@@ -40,7 +40,7 @@ return;
 <h1>Testing <%= module_name %> </h1>
 <script>
 
-var st = new simpleTable("Document.domain testing" ,2, [{type: 'string', value: 'Property Tested'}, {type: 'boolean', value: 'Overriding/Hooking allowed?'}]);
+var st = new simpleTable("<%= module_name %>" ,2, [{type: 'string', value: 'Property Tested'}, {type: 'boolean', value: 'Overriding/Hooking allowed?'}]);
 
 var userScript = document.getElementById('user_script').innerText;
 

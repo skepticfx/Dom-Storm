@@ -1,13 +1,27 @@
 <% include ../layouts/header.ejs %>
 <% include ../layouts/navbar.ejs %>
 
+<style>
+#userScript{
+    width: 100%;
+    height: 400px;
+}
+
+#enum_data{
+    width: 100%;
+    height: 100px;
+}
+
+</style>
+
+<script src="/public/js/vendor/ace/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
 <div class="container">  
 	<h1><%= title %></h1>
 
 
 <div class="well panel-heading">
-  <form class="bs-example form-horizontal" action="/modules/create" method="POST">
+  <form class="bs-example form-horizontal" action="/modules/create" method="POST" id="createModule">
 	<fieldset>
 	  <legend>Create a new 'Enum Function' module</legend>
 	  <div class="form-group">
@@ -58,35 +72,57 @@
 		  </div>
 		</div>
 	  </div>	  
-	  
+	
+
+  
 	  <div class="form-group">
 		<label for="userScript" class="col-lg-2 control-label">User Script</label>
 		<div class="col-lg-10">
-		  <textarea name="_userScript" class="form-control" rows="7" id="userScript"></textarea>
+		  <pre class="form-control" id="userScript"></pre>
 		  <span class="help-block">Come up with your own script to do a Enumeration Function scan. Read more <u>here</u></span>
 		</div>
 	  </div>	  
 
 	  <div class="form-group">
-		<label for="userScript" class="col-lg-2 control-label">Enumeration Data</label>
+		<label for="enum_data" class="col-lg-2 control-label">Enumeration Data</label>
 		<div class="col-lg-10">
-		  <textarea name="_enum_data" class="form-control" rows="3" id="enum_data"></textarea>
+		  <pre class="form-control" rows="3" id="enum_data"></pre>
 		  <span class="help-block">Specify your Enumeration Data here as a code. 
 			  <code>
 			  var data = [['window', 'postMessage.name'], ['document', 'domain']];
 			  </code>
 		  </span>
 		</div>
-	  </div>	
+	  </div>
+		<input type="hidden" name="_userScript" id="_userScript" value="" />
+		<input type="hidden" name="_enum_data" id="_enum_data" value="" />
 	  
 	  <div class="form-group">
 		<div class="col-lg-10 col-lg-offset-2">
-		  <button class="btn btn-default" type="reset">Clear</button> 
-		  <button type="submit" class="btn btn-primary">Submit</button> 
+		  <button id="submitButton" type="button" class="btn btn-primary">Submit</button> 
 		</div>
 	  </div>
 	</fieldset>
   </form>
 </div>			
 </div>
+
+</body>	
+<script>
+var userScript = ace.edit("userScript");
+userScript.setTheme("ace/theme/github");
+userScript.getSession().setMode("ace/mode/javascript");
+
+var enum_data = ace.edit("enum_data");
+enum_data.setTheme("ace/theme/github");
+enum_data.getSession().setMode("ace/mode/javascript");		
+$(document).ready(function() {
+		$('#submitButton').click(function(){
+			$('#_userScript').val(userScript.getValue());
+			$('#_enum_data').val(enum_data.getValue());
+			$('#createModule').submit();
+		});
+	});
+</script>
+
 <% include ../layouts/footer.ejs %>			

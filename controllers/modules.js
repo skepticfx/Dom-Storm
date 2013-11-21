@@ -120,8 +120,7 @@ exports.results = function(app){
 			if(err){
 				res.render('misc/error', {'info': 'Something wrong happened, when we tried creating your new module.'});
 			} else {
-				console.log(result);
-				res.redirect('/modules/?id='+ module._id);
+				res.redirect('/modules/?id='+ module_id);
 			}
 		});
 	});	
