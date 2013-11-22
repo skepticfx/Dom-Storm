@@ -1,1 +1,1 @@
-var topModules = [{"name":"Can location be spoofed?","id":"528e4e8453c101f80e000001"},{"name":"document.domain shadowing","id":"528e4f5f53c101f80e000002"}] ;
+var topModules = [{"name":"Can location be spoofed?","id":"528e4e8453c101f80e000001"},{"name":"document.domain shadowing","id":"528e4f5f53c101f80e000002"},{"name":"Test to check","id":"528e6a39a343cad81a000001"},{"name":"Test whether alert and console.log can be spoofed?","id":"528e6f27b0bf4cf006000001"}] ;
