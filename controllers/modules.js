@@ -39,23 +39,24 @@ exports.run = function(app){
 			var module_id = req.query.id;
 			var module = Modules.getModuleById(module_id, function(err, module){
 				if(err){
-					res.render('misc/error', {'info': 'If you\'re seeing this page, something has really gone wrong:('});
-				}
-				var module_details = {
-				'module_id': module._id,
-				'module_name': module.name,
-				'module_description': module.description,
-				'module_results': module.results,
-				'module_test': module.test
-				};
-				
-				switch(module_details.module_test._type){
-				case "ENUM_FUNCTION":
-				res.render('modules/runModule_enum_function', module_details);	
-				break;
-				
-				default:
-				res.render('misc/error', {'info': 'The Test Type is not defined yet'});
+					res.render('misc/error', {'info': 'Oops ! The test module is missing.'});
+				} else{
+					var module_details = {
+					'module_id': module._id,
+					'module_name': module.name,
+					'module_description': module.description,
+					'module_results': module.results,
+					'module_test': module.test
+					};
+					
+					switch(module_details.module_test._type){
+					case "ENUM_FUNCTION":
+					res.render('modules/runModule_enum_function', module_details);	
+					break;
+					
+					default:
+					res.render('misc/error', {'info': 'The Test Type is not defined yet'});
+					}
 				}
 			});
 		} else {
