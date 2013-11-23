@@ -13,7 +13,15 @@ var modulesSchema = mongoose.Schema({
 	results: {
 			_type: {type: String},
 			raw: {type: String},
-		  }		  
+			browsers: [
+				{	name: String,
+					raw: String
+				}
+					]
+		  },
+	
+	tags:  [],
+	created: { type: Date, default: Date.now }	
 
 });
 

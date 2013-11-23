@@ -40,7 +40,15 @@ return;
 <h1>Testing <%= module_name %> </h1>
 <script>
 
-var st = new simpleTable("<%= module_name %>" ,2, [{type: 'string', value: 'Property Tested'}, {type: 'boolean', value: 'Overriding/Hooking allowed?'}]);
+var browser = "undetected";
+var browser_name = "undetected";
+var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+if (is_chrome){
+	browser = "GOOGLE_CHROME";
+	browser_name = "Google Chrome";
+}
+
+var st = new simpleTable('<img src="/public/imgs/browser-logos/'+ browser +'.png" />' ,2, [{type: 'string', value: 'Property Tested'}, {type: 'boolean', value: 'Overriding/Hooking allowed?'}]);
 
 var userScript = document.getElementById('user_script').innerText;
 
@@ -76,12 +84,12 @@ for(x in data){
 function endTest(){
 	var r = new Results('SIMPLE_TABLE', st);
 	document.body.innerHTML += r.getHTML();
-	
+
 	var module_id = '<%=module_id%>';
 	var xhr = new XMLHttpRequest();
 	xhr.open('POST', '/modules/results/update', true);
 	xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-	xhr.send('_module_id='+module_id+'&_results_raw='+encodeURIComponent(r.getHTML()));
+	xhr.send('_module_id='+module_id+'&_browser='+browser+'&_results_raw='+encodeURIComponent(r.getHTML()));
 
 }
 

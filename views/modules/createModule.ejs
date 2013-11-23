@@ -78,7 +78,48 @@
 	  <div class="form-group">
 		<label for="userScript" class="col-lg-2 control-label">User Script</label>
 		<div class="col-lg-10">
-		  <pre class="form-control" id="userScript"></pre>
+		  <pre class="form-control" id="userScript">
+function hook(Obj, prop, newValue){
+try{
+	Object.defineProperty(Obj, prop, {
+		'get': function(){ return newValue;}
+	});
+}	
+	
+catch(err){
+	console.log(err, Obj, prop);
+}
+	
+}
+
+function test(x, y){
+	// We need to separate properties and access one by one.
+	var tmp;
+	var before = this[x];
+	
+	var prop = y.split('.');
+	
+	for(tmp in prop){
+		before = before[prop[tmp]];
+	}
+
+	
+	hook(this[x], y, 'test_xyz_value');
+	var after = this[x];
+	for(tmp in prop){
+		after = after[prop[tmp]];
+	}	
+
+	if(	before == after){
+		console.log(x + '.'+ y +' Not Changed');
+                addResult(x + '.'+ y ,  'No');
+	} else {
+		console.log(x + '.'+ y +' Changed');
+                addResult(x + '.'+ y ,  'Yes');
+	}
+
+}
+</pre>
 		  <span class="help-block">Come up with your own script to do a Enumeration Function scan. Read more <u>here</u></span>
 		</div>
 	  </div>	  
@@ -86,7 +127,9 @@
 	  <div class="form-group">
 		<label for="enum_data" class="col-lg-2 control-label">Enumeration Data</label>
 		<div class="col-lg-10">
-		  <pre class="form-control" rows="3" id="enum_data"></pre>
+		  <pre class="form-control" rows="3" id="enum_data">
+var data = [['window', 'postMessage.name'], ['document', 'domain'], ['window', 'document.location'], ['location', 'href'], ['document', 'body.innerHTML'], ['document', 'location.origin'], ['window', 'location']];
+</pre>
 		  <span class="help-block">Specify your Enumeration Data here as a code. 
 			  <code>
 			  var data = [['window', 'postMessage.name'], ['document', 'domain']];

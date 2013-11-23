@@ -113,13 +113,27 @@ exports.results = function(app){
 		var module_id = req.body._module_id;
 		var results = {};
 		results.raw = req.body._results_raw;
+		var browser = {};
+		browser.name = req.body._browser;
+		browser.raw = '';
 		var test = {};
 		test.state = 'COMPLETED'; //  COMPLETE
 
-		Modules.update({'_id': module_id}, {'results.raw': results.raw, 'test.state': test.state},  function(err, result){
+		Modules.findOneAndUpdate({'_id': module_id}, {'results.raw': results.raw, $push: {'results.browsers': browser}, 'test.state': test.state},  function(err, result){
 			if(err){
 				res.render('misc/error', {'info': 'Something wrong happened, when we tried creating your new module.'});
 			} else {
+				console.log("adasdasdasasdds" +result);
+				var Obj = {}
+				Obj.name = result.name;
+				Obj.id = result._id;
+				fs.appendFile(process.cwd()+'/public/js/modulesList.js', 'topModules.push('+ JSON.stringify(Obj) + ');', function(err){
+					if(err){
+						console.log('There is some error in writing the list to modulesList.js');
+					} else {
+						console.log('Great ! Updated the list of modules in modulesList.js');
+					}				
+				});
 				res.redirect('/modules/?id='+ module_id);
 			}
 		});
