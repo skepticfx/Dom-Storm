@@ -16,5 +16,6 @@ exports.set = function(app){
 	modules.index(app);
 	modules.run(app);
 	modules.results(app);
+	modules.edit(app);
 
 };

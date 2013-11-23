@@ -11,6 +11,23 @@
 </center>
 </div>
 
+<div class="panel panel-default">
+		<div style="display: inline">
+		<input type="hidden" name="id" value="<%= module_id %>"/>
+		<a class="btn btn-primary" onClick="window.open('/modules/run?id=<%= module_id %>')">Run Test</a>
+		</div>
+
+		<form id="edit-module" action="/modules/edit" method="GET" style="display: inline">
+		<input type="hidden" name="id" value="<%= module_id %>"/>
+		<a class="btn btn-info" onClick="document.getElementById('edit-module').submit();">Edit Module</a>
+		</form>
+
+		<form id="delete-module" action="/modules/delete" method="POST" style="display: inline">
+		<input type="hidden" name="_id" value="<%= module_id %>"/>
+		<a class="btn btn-danger" onClick="document.getElementById('delete-module').submit();">Delete Module</a>
+		</form>		
+</div>
+
 
   <div class="column">      
 	<div class="column">
@@ -63,12 +80,6 @@
 	</div>	
 
 	
-	<div class="column">
-		<form id="test-form" action="/modules/run" target="_blank" method="GET">
-		<input type="hidden" name="id" value="<%= module_id %>"/>
-		<p><a class="btn btn-danger" onClick="document.getElementById('test-form').submit();">Run Test</a></p>
-		</form>
-	</div>  
 
 </div>
 

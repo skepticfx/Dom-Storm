@@ -94,16 +94,90 @@ exports.create = function(app){
 			if(err){
 				res.render('misc/error', {'info': 'Something wrong happened, when we tried creating your new module.'});
 			} else {
+				var Obj = {}
+				Obj.name = module.name;
+				Obj.id = module._id;
+				// This can happen asynchronously. Still have to check what goes wrong. We can get the hit of the user not seeing the module immediately in the NavBar.
+				fs.appendFile(process.cwd()+'/public/js/modulesList.js', 'topModules.push('+ JSON.stringify(Obj) + ');', function(err){
+					if(err){
+						console.log('There is some error in writing the list to modulesList.js');
+					} else {
+						console.log('Great ! Updated the list of modules in modulesList.js');
+					}				
+				});
 				res.redirect('/modules/?id='+ module._id);
 			}
 		});
 	});	
-	
-
 
 }
 
+// Creates a new module
+exports.edit = function(app){
 
+	// Deletes a module
+	app.post('/modules/delete', function(req, res){
+		if(typeof req.body._id != 'undefined'){
+			Modules.findOne({_id: req.body._id}, function(err, module){
+				if(err){
+					res.render('misc/error', {'info': 'Apparently, the module is missing in our system.'});
+					res.end();				
+				} else {
+					module.remove();
+					res.redirect('/');
+				}
+			});
+		} else {
+			res.render('misc/error', {'info': 'Apparently, the module is missing in our system.'});
+			res.end();
+		}
+	});
+
+	// The UI
+	app.get('/modules/edit', function(req, res){
+		if(typeof req.query.id != 'undefined'){
+			var module_id = req.query.id;
+			var module = Modules.getModuleById(module_id, function(err, module){
+				if(err){
+					res.render('misc/error', {'info': 'Apparently, the module is missing in our system.'});
+					res.end();
+				} else {
+					res.render('modules/editModule', {title: 'Edit this module', module: module});
+				}
+			});
+		} else {
+			res.render('misc/error', {'info': 'Apparently, the module is missing in our system.'});
+			res.end();
+		}
+	});
+
+	// Form
+	app.post('/modules/edit', function(req, res){
+		var results = {};
+		results._type = req.body._results_type;
+		results.raw = "";
+		var test = {};
+		test.state = 'NOT_STARTED'; // ERROR, COMPLETE
+		test._type = req.body._module_type;
+		test.userScript = req.body._userScript;
+		test.enum_data = req.body._enum_data;
+		var module_id = req.body._id;
+		var newModule = {};
+		newModule.results = results;
+		newModule.test = test;
+		newModule.name = req.body._name;
+		newModule.description = req.body._desc;
+
+		Modules.findOneAndUpdate(module_id, newModule, function(err, module){
+			if(err){
+				res.render('misc/error', {'info': 'Something wrong happened, when we tried creating your new module.'});
+			} else {
+				res.redirect('/modules/?id='+ module._id);
+			}
+		});
+	});	
+
+}
 
 
 exports.results = function(app){
@@ -123,18 +197,7 @@ exports.results = function(app){
 			if(err){
 				res.render('misc/error', {'info': 'Something wrong happened, when we tried creating your new module.'});
 			} else {
-				console.log("adasdasdasasdds" +result);
-				var Obj = {}
-				Obj.name = result.name;
-				Obj.id = result._id;
-				fs.appendFile(process.cwd()+'/public/js/modulesList.js', 'topModules.push('+ JSON.stringify(Obj) + ');', function(err){
-					if(err){
-						console.log('There is some error in writing the list to modulesList.js');
-					} else {
-						console.log('Great ! Updated the list of modules in modulesList.js');
-					}				
-				});
-				res.redirect('/modules/?id='+ module_id);
+				res.redirect('/modules/?id='+ result._id);
 			}
 		});
 	});	

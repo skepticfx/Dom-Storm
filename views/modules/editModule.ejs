@@ -21,19 +21,20 @@
 
 
 <div class="well panel-heading">
-  <form class="bs-example form-horizontal" action="/modules/create" method="POST" id="createModule">
+  <form class="bs-example form-horizontal" action="/modules/edit" method="POST" id="createModule">
+  <input type="hidden" name= "_id" value="<%= module._id%>" />
 	<fieldset>
-	  <legend>Create a new 'Enum Function' module</legend>
+	  <legend>Edit this module</legend>
 	  <div class="form-group">
 		<label for="inputName" class="col-lg-2 control-label">Name</label>
 		<div class="col-lg-10">
-		  <input type="text" name="_name" class="form-control" id="inputName" placeholder="Properties of document.window">
+		  <input type="text" name="_name" class="form-control" id="inputName" placeholder="Properties of document.window" value="<%= module.name%>">
 		</div>
 	  </div>
 	  <div class="form-group">
 		<label for="inputDesc" class="col-lg-2 control-label">Description</label>
 		<div class="col-lg-10">
-		  <input type="text" class="form-control" name="_desc" id="inputDesc" placeholder="Lists all the document.window properties">
+		  <input type="text" class="form-control" name="_desc" id="inputDesc" placeholder="Lists all the document.window properties" value="<%= module.description%>">
 		</div>
 	  </div>
 
@@ -78,21 +79,7 @@
 	  <div class="form-group">
 		<label for="userScript" class="col-lg-2 control-label">User Script</label>
 		<div class="col-lg-10">
-		  <pre class="form-control" id="userScript">
-function test(obj){
-	// We need to separate properties and access one by one.
-
-
-	if(	obj.before == obj.after){
-		console.log(obj.before + '.'+ obj.before +' Not Changed');
-                addResult(obj.before + '.'+ obj.before ,  'No');
-	} else {
-		console.log(obj.before + '.'+ obj.before +' Changed');
-                addResult(obj.before + '.'+ obj.before ,  'Yes');
-	}
-
-}
-</pre>
+		  <pre class="form-control" id="userScript"><%= module.test.userScript%></pre>
 		  <span class="help-block">Come up with your own script to do a Enumeration Function scan. Read more <u>here</u></span>
 		</div>
 	  </div>	  
@@ -100,9 +87,7 @@ function test(obj){
 	  <div class="form-group">
 		<label for="enum_data" class="col-lg-2 control-label">Enumeration Data</label>
 		<div class="col-lg-10">
-	<pre class="form-control" rows="3" id="enum_data">
-var data = [{before: '1', after: '2'}, {before: '1', after: '1'}, {before: '2', after: '2'}];
-</pre>
+	<pre class="form-control" rows="3" id="enum_data"><%= module.test.enum_data%></pre>
 		  <span class="help-block">Specify your Enumeration Data here as a code. 
 			  <code>
 			  var data = [{before: '1', after: '2'}, {before: '1', after: '1'}, {before: '2', after: '2'}];
@@ -115,7 +100,7 @@ var data = [{before: '1', after: '2'}, {before: '1', after: '1'}, {before: '2', 
 	  
 	  <div class="form-group">
 		<div class="col-lg-10 col-lg-offset-2">
-		  <button id="submitButton" type="button" class="btn btn-primary">Create Module</button> 
+		  <button id="submitButton" type="button" class="btn btn-primary">Edit Module</button> 
 		</div>
 	  </div>
 	</fieldset>

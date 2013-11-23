@@ -9,24 +9,22 @@ Testing <%= module_name %>
 
 <body>
 <textarea id="user_script" style="display:none;">
-<html>
-<head>
-<title>
-Testing with IFRAME
-</title>
-<script src="/public/js/results.js"> </script>
-</head>
-<body>
-<h1>Testing</h1>
-</body>
-<script>
+
 // Our code
 
+var Test = new Object();
+var theCallback = "";
 var addResult = function(){
 	top.window.st.addResult(arguments);
+	theCallback();
 return;
 }
 
+	
+var callTest = function(dataObj, callback){
+	theCallback = function(){callback();};
+	test(dataObj);
+}
 
 // The userScript for the Module
 
@@ -52,48 +50,57 @@ var st = new simpleTable('<img src="/public/imgs/browser-logos/'+ browser +'.png
 
 var userScript = document.getElementById('user_script').innerText;
 
-function newIframe(injectMe){
+function newIframe(injectMe, iframeCreated){
 	var iframe = document.createElement('iframe');
-	iframe.onload = function(){ injectScript(this, injectMe)}
+	iframe.onload = function(){ injectScript(this, injectMe); iframeCreated(iframe);}
 	document.body.appendChild(iframe);
-	
-return iframe;
-}
-
-function removeMe(node){
-	return node.parentNode.removeChild(node);
 }
 
 function injectScript(iframe, inject){
-	iframe.contentWindow.document.write(inject);
+	var script = iframe.contentWindow.document.createElement('script');
+	script.type = 'text/javascript';
+	script.innerHTML = inject;
+	iframe.contentWindow.document.body.appendChild(script);
 }
 
 // The Enum Data for the given module.
 <%- module_test.enum_data %>
 
 // Type = Data Enumeration using a test Function
-for(x in data){
-	var test_call = "test('"+ data[x][0];
-	var y;
-	for(y=1; y<data[x].length; y++)
-		test_call += "', '" + data[x][y] ;
-	test_call += "');";
-	new_iframe = newIframe(userScript+" " + test_call + "</scr" + "ipt></bod"+ "y></htm"+ "l>");
-}
+var x = 0;
+
+(function testLoop(){
+	if(x == data.length){
+		endTest();
+	return;
+	}
+	newIframe(userScript , function(testNode){
+		testNode.contentWindow.callTest.call(testNode.contentWindow, data[x], function(){
+			testNode.parentNode.removeChild(testNode);
+			x++;
+			testLoop();
+		});
+	});
+}());
+
 
 function endTest(){
 	var r = new Results('SIMPLE_TABLE', st);
-	document.body.innerHTML += r.getHTML();
-
+	//document.body.innerHTML += r.getHTML();
+	document.body.innerHTML += '<h1>The test is complete now. </h1> <h2>This window will close right now.</h2>';
 	var module_id = '<%=module_id%>';
 	var xhr = new XMLHttpRequest();
 	xhr.open('POST', '/modules/results/update', true);
 	xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 	xhr.send('_module_id='+module_id+'&_browser='+browser+'&_results_raw='+encodeURIComponent(r.getHTML()));
-
+	
+	setTimeout(function(){
+		window.opener.location.reload();
+		this.close();
+	}, 2000);
 }
 
-setTimeout(endTest, 3000);
+
 
 </script>
 
