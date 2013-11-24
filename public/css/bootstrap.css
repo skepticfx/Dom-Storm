@@ -757,6 +757,10 @@ address {
   line-height: 1.428571429;
 }
 
+*:focus {
+    outline: none;
+}
+
 code,
 kbd,
 pre,
@@ -782,7 +786,7 @@ pre {
   color: #7b8a8b;
   word-break: break-all;
   word-wrap: break-word;
-  background-color: #ecf0f1;
+  background-color: #ffffff;
   border: 1px solid #cccccc;
   border-radius: 4px;
 }
@@ -5561,13 +5565,16 @@ a.list-group-item.active > .badge,
 }
 
 .jumbotron {
-  padding: 30px;
-  margin-bottom: 30px;
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  margin-top: 10px;
   font-size: 23px;
   font-weight: 200;
   line-height: 2.1428571435;
   color: inherit;
-  background-color: #ecf0f1;
+  background-color: #ffffff;
 }
 
 .jumbotron h1 {
