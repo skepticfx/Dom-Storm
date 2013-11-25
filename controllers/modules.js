@@ -98,15 +98,7 @@ exports.create = function(app){
 				var Obj = {}
 				Obj.name = module.name;
 				Obj.id = module._id;
-				// This can happen asynchronously. Still have to check what goes wrong. We can get the hit of the user not seeing the module immediately in the NavBar.
-				fs.appendFile(process.cwd()+'/public/js/modulesList.js', 'topModules.push('+ JSON.stringify(Obj) + ');', function(err){
-					if(err){
-						console.log('There is some error in writing the list to modulesList.js');
-					} else {
-						console.log('Great ! Updated the list of modules in modulesList.js');
-					}				
-				});
-				res.redirect('/modules/?id='+ module._id);
+				res.redirect('/update?module='+module._id);
 			}
 		});
 	});	
@@ -125,7 +117,7 @@ exports.edit = function(app){
 					res.end();				
 				} else {
 					module.remove();
-					res.redirect('/');
+					res.redirect('/update');
 				}
 			});
 		} else {
@@ -203,4 +195,32 @@ exports.results = function(app){
 		});
 	});	
 	
+	// Hackish to Update the stuff.
+	app.get('/update', function(req, res){
+		Modules.find({}, function(err, modules){
+			if(err){
+				console.log('There is some error populating the Modules List');
+			} else {
+				var modulesList = [];
+				for(x in modules){
+					var obj = {};
+					obj.name = modules[x].name;
+					obj.id = modules[x]._id;
+					modulesList.push(obj);
+				}
+				fs.writeFile(process.cwd()+'/public/js/modulesList.js', 'var topModules = '+ JSON.stringify(modulesList) + ' ;', function(err){
+					if(err){
+						console.log('There is some error in writing the list to modulesList.js');
+					} else {
+						console.log('Great ! Populated the list of modules.');
+						if(typeof req.query.module != 'undefined'){
+							res.redirect('/modules/?id='+req.query.module);
+						} else {	
+							res.redirect('/');
+						}
+					}				
+				});
+			}
+		});
+	});		
 }

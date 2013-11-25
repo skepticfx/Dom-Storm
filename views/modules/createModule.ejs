@@ -27,13 +27,13 @@
 	  <div class="form-group">
 		<label for="inputName" class="col-lg-2 control-label">Name</label>
 		<div class="col-lg-10">
-		  <input type="text" name="_name" class="form-control" id="inputName" placeholder="Properties of document.window">
+		  <input type="text" name="_name" class="form-control" id="inputName" placeholder="Properties of window.document">
 		</div>
 	  </div>
 	  <div class="form-group">
 		<label for="inputDesc" class="col-lg-2 control-label">Description</label>
 		<div class="col-lg-10">
-		  <input type="text" class="form-control" name="_desc" id="inputDesc" placeholder="Lists all the document.window properties">
+		  <input type="text" class="form-control" name="_desc" id="inputDesc" placeholder="Lists all the window.document properties">
 		</div>
 	  </div>
 
@@ -61,7 +61,7 @@
 		  <div class="radio">
 			<label>
 			  <input type="radio" name="_results_type" id="optionsRadios1" value="SIMPLE_TABLE" checked="">
-			  Simple Table Format
+			  Simple Table Format (Double Column Format)
 			</label>
 		  </div>
 		  <div class="radio">
@@ -79,18 +79,22 @@
 		<label for="userScript" class="col-lg-2 control-label">User Script</label>
 		<div class="col-lg-10">
 		  <pre class="form-control" id="userScript">
-function test(obj){
+function test(data){
 	// We need to separate properties and access one by one.
+try{
 
-
-	if(	obj.before == obj.after){
-		console.log(obj.before + '.'+ obj.before +' Not Changed');
-                addResult(obj.before + '.'+ obj.before ,  'No');
+	if(	data.before == data.after){
+		console.log(data.before + '.'+ data.before +' Not Changed');
+                addResult(data.before + '.'+ data.before ,  'No');
 	} else {
-		console.log(obj.before + '.'+ obj.before +' Changed');
-                addResult(obj.before + '.'+ obj.before ,  'Yes');
+		console.log(data.before + '.'+ data.before +' Changed');
+                addResult(data.before + '.'+ data.before ,  'Yes');
 	}
+}
 
+catch(err){
+	addResult(data.before + '.'+ data.before ,  'Probably Not');
+}
 }
 </pre>
 		  <span class="help-block">Come up with your own script to do a Enumeration Function scan. Read more <u>here</u></span>
