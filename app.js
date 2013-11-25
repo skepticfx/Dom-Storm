@@ -10,7 +10,7 @@ var path = require('path');
 var fs = require('fs');
 
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://nafeez:secret123@ds053788.mongolab.com:53788/dom-storm');
+mongoose.connect('mongodb://USERNAME:PASSWORD@DATABASE-URI:PORT/DB-NAME');
 console.log('Hold On ! We are connecting to the database.');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));

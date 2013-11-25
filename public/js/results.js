@@ -27,7 +27,7 @@ function simpleTable(title, count, cols_arr){
 	// Creates and returns a HTML table format.
 	// TODO: Encoding of inputs.
 	this.getHTML = function(){
-		var table_html = '<div class="col-lg-12"><div class="page-header"><h1 id="tables">' + this.title + '</h1></div><div class="bs-example table-responsive"><table class="table table-striped table-bordered table-hover"> <thead><tr>';
+		var table_html = '<div class="page-header"><h1 id="tables">' + this.title + '</h1></div><div class="bs-example table-responsive"><table class="table table-striped table-bordered table-hover"> <thead><tr>';
 		// Iterate the columns
 		for(i=0; i<this.columns.length; i++){
 			table_html += '<th>'+ this.columns[i].value +'</th>'
@@ -41,7 +41,7 @@ function simpleTable(title, count, cols_arr){
 			}
 			table_html += '</tr>';
 		}
-		table_html += '</tbody></table></div></div>';
+		table_html += '</tbody></table></div>';
 	return table_html;	
 	}
 }

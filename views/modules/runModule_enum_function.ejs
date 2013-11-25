@@ -46,7 +46,7 @@ if (is_chrome){
 	browser_name = "Google Chrome";
 }
 
-var st = new simpleTable('<img src="/public/imgs/browser-logos/'+ browser +'.png" />' ,2, [{type: 'string', value: 'Property Tested'}, {type: 'boolean', value: 'Overriding/Hooking allowed?'}]);
+var st = new simpleTable('' ,2, [{type: 'string', value: 'Property Tested'}, {type: 'boolean', value: 'Overriding/Hooking allowed?'}]);
 
 var userScript = document.getElementById('user_script').innerText;
 
@@ -75,7 +75,7 @@ var x = 0;
 	return;
 	}
 	newIframe(userScript , function(testNode){
-		testNode.contentWindow.callTest.call(testNode.contentWindow, data[x], function(){
+		testNode.contentWindow.callTest.call(undefined, data[x], function(){
 			testNode.parentNode.removeChild(testNode);
 			x++;
 			testLoop();
