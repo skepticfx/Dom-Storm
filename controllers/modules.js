@@ -1,5 +1,5 @@
 // Routes for anything '/modules' related
-//528dd7c1c6bbedf415000002
+
 var fs = require('fs');
 var Modules = require(process.cwd()+'/models/Modules.js').Modules;
 
@@ -25,10 +25,15 @@ exports.index = function(app){
 				}
 			});
 		} else {
-			res.render('modules/index', {'title': 'Modules'});	
+			Modules.find({}, function(err, modules){
+				if(err){
+					console.log('There is some error populating the Modules List');
+				} else {
+					res.render('modules/index', {'title': 'Modules', 'modules': modules});	
+				}
+			});
 		}
 	});
-
 }
 
 // Loads and runs the module test page from /models/core/modules_test/
@@ -117,7 +122,7 @@ exports.edit = function(app){
 					res.end();				
 				} else {
 					module.remove();
-					res.redirect('/update');
+					res.redirect('/update?module='+req.body._id);
 				}
 			});
 		} else {
@@ -161,7 +166,7 @@ exports.edit = function(app){
 		newModule.name = req.body._name;
 		newModule.description = req.body._desc;
 
-		Modules.findOneAndUpdate(module_id, newModule, function(err, module){
+		Modules.findOneAndUpdate({'_id': module_id}, newModule, function(err, module){
 			if(err){
 				res.render('misc/error', {'info': 'Something wrong happened, when we tried creating your new module.'});
 			} else {
