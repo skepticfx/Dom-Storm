@@ -2,20 +2,15 @@
  * Dom Storm. Built using Express, EJS, Mongoose, ACE
  */
 
-console.log('Starting server.js');
 var express = require('express');
 var controllers = require('./controllers');
 var modules = require('./controllers/modules.js');
 var http = require('http');
 var path = require('path');
 var fs = require('fs');
-var config = require('./config.js').config;
-
-var ipaddress = process.env.OPENSHIFT_NODEJS_IP;
-var port      = process.env.OPENSHIFT_NODEJS_PORT || 8080;
 
 var mongoose = require('mongoose');
-mongoose.connect(config.DB_URL);
+mongoose.connect('mongodb://USERNAME:PASSWORD@DATABASE-URI:PORT/DB-NAME');
 console.log('Hold On ! We are connecting to the database.');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -63,8 +58,8 @@ db.once('open', function () {
 					console.log('There is some error in writing the list to modulesList.js');
 				} else {
 					console.log('Great ! Populated the list of modules.');
-					http.createServer(app).listen(port, ipaddress, function(){
-						console.log('Dom Storm server listening on port ' + port);
+					http.createServer(app).listen(app.get('port'), function(){
+						console.log('Dom Storm server listening on port ' + app.get('port'));
 					});
 				}				
 			});
