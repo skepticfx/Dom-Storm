@@ -212,7 +212,7 @@ exports.results = function(app){
 		var updateObj = {};
 		updateObj['test.state'] = test.state;
 		updateObj['results.browsers.'+req.body._browser] = browser;
-console.log(JSON.stringify(updateObj));
+
 		Modules.findOneAndUpdate({'_id': module_id}, updateObj,  function(err, result){
 			if(err){
 				res.render('misc/error', {'info': 'Something wrong happened, when we tried creating your new module.'});
@@ -235,7 +235,7 @@ console.log(JSON.stringify(updateObj));
 					obj.id = modules[x]._id;
 					modulesList.push(obj);
 				}
-				fs.writeFile(process.cwd()+'/public/js/modulesList.js', 'var topModules = '+ JSON.stringify(modulesList) + ' ;', function(err){
+				fs.writeFile(process.cwd()+'/dynamic/js/modulesList.js', 'var topModules = '+ JSON.stringify(modulesList) + ' ;', function(err){
 					if(err){
 						console.log('There is some error in writing the list to modulesList.js');
 					} else {
