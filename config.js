@@ -1,7 +1,7 @@
 // Config File
 
 var config = {};
-config.DB_URL = 'mongodb://nafeez:secret123@ds053788.mongolab.com:53788/dom-storm';
-//mongodb://nafeez:secret123@ds053788.mongolab.com:53788/dom-storm
+config.DB_URL = '';
+
 
 exports.config = config;
