@@ -8,6 +8,9 @@
 <center>
 			<h1><%= module_name %></h1>
 			<p><h5><%= module_description %></h5></p>
+			<% for(tags in module.tags){ %>
+			<span class="label label-danger"><%= module.tags[tags] %></span>
+			<% } %>
 </center>
 		<div id="div-favorite" style="position: absolute; top:10%; left:15%; ">
 			<form id="favorite-module" action="/modules/favorite" method="POST" style="display: inline">
@@ -18,7 +21,7 @@
 
 		<div id="div-fork" style="position: absolute; top:16%; left:15%; ">		
 			<form id="fork-module" action="/modules/fork" method="GET" style="display: inline">
-			<input type="hidden" name="_id" value="<%= module_id %>"/>
+			<input type="hidden" name="id" value="<%= module_id %>"/>
 			<a class="btn btn-warning" title="Fork this module" onClick="document.getElementById('fork-module').submit();"><img src="/public/imgs/icons/fork.png"/></a>
 			</form>		
 		</div>
@@ -48,8 +51,6 @@
 		<br/>
 
   <div class="column"> 
-
-
 
 
   
