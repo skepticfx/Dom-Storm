@@ -39,7 +39,7 @@ db.once('open', function () {
 	app.use(express.urlencoded());
 	app.use(app.router);
 	app.use("/dynamic",express.static(path.join(__dirname, '/dynamic')));
-	
+
 	app.use(express.compress());
 	app.use("/public",express.static(path.join(__dirname, '/public'), {maxAge: oneDay} ));
 
@@ -52,7 +52,7 @@ db.once('open', function () {
 	// routing
 	controllers.set(app);
 
-	console.log('Hold On Again! We are fetching the list of modules.');	
+	console.log('Hold On Again! We are fetching the list of modules.');
 	Modules.find({}, function(err, modules){
 		if(err){
 			console.log('There is some error populating the Modules List');
@@ -72,8 +72,8 @@ db.once('open', function () {
 					http.createServer(app).listen(port, function(){
 						console.log('Dom Storm server listening on port ' + port);
 					});
-				}				
+				}
 			});
 		}
 	});
-});	
+});
