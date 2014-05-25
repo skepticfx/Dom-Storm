@@ -9,10 +9,14 @@ var modules = require('./controllers/modules.js');
 var http = require('http');
 var path = require('path');
 var fs = require('fs');
+var passport = require('passport');
+var TwitterStrategy = require('passport-twitter').Strategy;
 var config = require('./config.js').config;
+var User = require(process.cwd()+'/models/Modules.js').User;
+var Modules = require(process.cwd()+'/models/Modules.js').Modules;
 
-var ipaddress = '';
-var port      = process.env.PORT || 8080;
+var ipaddress  = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
+var port    = process.env.OPENSHIFT_NODEJS_PORT || 8080;
 
 var oneDay = '86400000';
 
@@ -23,25 +27,73 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
 	console.log('Alright ! Connected to the database.');
-	var Modules = require(process.cwd()+'/models/Modules.js').Modules;
 
 	var app = express();
 
 	// all environments
-	app.set('port', process.env.PORT || 3000);
 	app.set('views', path.join(__dirname, 'views'));
 	app.set('view engine', 'ejs');
+
+
+function myMiddleware (req, res, next) {
+  res.locals.user = req.user;
+  next();
+}
+
+
 
 	// middleware stack
 	app.use(express.favicon());
 	app.use(express.logger('dev'));
 	app.use(express.json());
+  app.use(express.cookieParser());
+  app.use(express.session({ secret: 'xss 123' }));
+  app.use(passport.initialize());
+  app.use(passport.session());
 	app.use(express.urlencoded());
+  app.use(myMiddleware);
+
+  app.use(express.compress());
 	app.use(app.router);
 	app.use("/dynamic",express.static(path.join(__dirname, '/dynamic')));
 
-	app.use(express.compress());
 	app.use("/public",express.static(path.join(__dirname, '/public'), {maxAge: oneDay} ));
+	app.use("/bower_components",express.static(path.join(__dirname, '/bower_components'), {maxAge: oneDay} ));
+
+passport.use(new TwitterStrategy({
+    consumerKey: config.TWITTER_CONSUMER_KEY,
+    consumerSecret: config.TWITTER_CONSUMER_SECRET,
+    callbackURL: "http://domstorm.skepticfx.com/auth/twitter/callback"
+  },
+  function(token, tokenSecret, profile, done) {
+    User.findOne({uid: profile.id}, function(err, user) {
+      if(user) {
+        done(null, user);
+      } else {
+        var user = new User();
+        user.provider = "twitter";
+        user.uid = profile.id;
+        user.name = profile.displayName;
+        user.image = profile._json.profile_image_url;
+        user.save(function(err) {
+          if(err) { throw err; }
+          done(null, user);
+        });
+      }
+    })
+  }
+));
+
+
+passport.serializeUser(function(user, done) {
+  done(null, user.uid);
+});
+
+passport.deserializeUser(function(uid, done) {
+  User.findOne({uid: uid}, function (err, user) {
+    done(err, user);
+  });
+});
 
 
 	// development only
@@ -69,8 +121,8 @@ db.once('open', function () {
 					console.log('There is some error in writing the list to modulesList.js');
 				} else {
 					console.log('Great ! Populated the list of modules.');
-					http.createServer(app).listen(port, function(){
-						console.log('Dom Storm server listening on port ' + port);
+					http.createServer(app).listen(port, ipaddress, function(){
+						console.log('Dom Storm server listening on ' + ipaddress + ":" +port);
 					});
 				}
 			});

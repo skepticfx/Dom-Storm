@@ -3,6 +3,12 @@
 var fs = require('fs');
 var Modules = require(process.cwd()+'/models/Modules.js').Modules;
 
+// test authentication
+function ensureAuthenticated(req, res, next) {
+	if (req.isAuthenticated()) { return next(); }
+		res.redirect('/?authError=1');
+}
+
 // Loads the module home and individual modules
 exports.index = function(app){
 
@@ -31,7 +37,7 @@ exports.index = function(app){
 				if(err){
 					console.log('There is some error populating the Modules List');
 				} else {
-					res.render('modules/index', {'title': 'Modules', 'modules': modules});	
+					res.render('modules/index', {'title': 'Modules', 'modules': modules});
 				}
 			});
 		}
@@ -41,7 +47,7 @@ exports.index = function(app){
 // Loads and runs the module test page from /models/core/modules_test/
 exports.run = function(app){
 
-	app.get('/modules/run', function(req, res){
+	app.get('/modules/run', ensureAuthenticated, function(req, res){
 		if(typeof req.query.id != 'undefined'){
 			var module_id = req.query.id;
 			var module = Modules.getModuleById(module_id, function(err, module){
@@ -55,12 +61,12 @@ exports.run = function(app){
 					'module_results': module.results,
 					'module_test': module.test
 					};
-					
+
 					switch(module_details.module_test._type){
 					case "ENUM_FUNCTION":
-					res.render('modules/runModule_enum_function', module_details);	
+					res.render('modules/runModule_enum_function', module_details);
 					break;
-					
+
 					default:
 					res.render('misc/error', {'info': 'The Test Type is not defined yet'});
 					}
@@ -68,7 +74,7 @@ exports.run = function(app){
 			});
 		} else {
 			res.status(404);
-			res.render('misc/404', {'info': 'Missing module id.' });	
+			res.render('misc/404', {'info': 'Missing module id.' });
 		}
 	});
 
@@ -78,13 +84,13 @@ exports.run = function(app){
 exports.create = function(app){
 
 	// The UI
-	app.get('/modules/create', function(req, res){
+	app.get('/modules/create', ensureAuthenticated, function(req, res){
 		res.render('modules/createModule', {'title':'Create a new Module'});
 	});
 
 	// Form
-	app.post('/modules/create', function(req, res){
-		
+	app.post('/modules/create', ensureAuthenticated, function(req, res){
+
 		var results = {};
 		results.type = req.body._results_type;
 		var columns = [];
@@ -92,14 +98,14 @@ exports.create = function(app){
 			var num_cols = req.body._num_cols;
 			for(var i=1;i <= num_cols; i++){
 				columns.push(req.body['_cols_'+i]);
-			}	
+			}
 		}
-		results.columns = columns;	
-		
+		results.columns = columns;
+
 		var tags = req.body._tags;
 		tags = tags.replace(/ /g,'');
 		tags = tags.split(',');
-		
+
 		var test = {};
 		test.state = 'NOT_STARTED'; // ERROR, COMPLETE
 		test.type = req.body._module_type;
@@ -112,7 +118,7 @@ exports.create = function(app){
 		newModule.name = req.body._name;
 		newModule.description = req.body._desc;
 		newModule.tags = tags;
-		
+
 		Modules.add(newModule, function(err, module){
 			if(err){
 				res.render('misc/error', {'info': 'Something wrong happened, when we tried creating your new module.'});
@@ -123,20 +129,20 @@ exports.create = function(app){
 				res.redirect('/update?module='+module._id);
 			}
 		});
-	});	
+	});
 
 }
 
-// Edits a module
+// Edits a module including delete, edit, fork etc.
 exports.edit = function(app){
 
 	// Deletes a module
-	app.post('/modules/delete', function(req, res){
+	app.post('/modules/delete', ensureAuthenticated, function(req, res){
 		if(typeof req.body._id != 'undefined'){
 			Modules.findOne({_id: req.body._id}, function(err, module){
 				if(err){
 					res.render('misc/error', {'info': 'Apparently, the module is missing in our system.'});
-					res.end();				
+					res.end();
 				} else {
 					module.remove();
 					res.redirect('/update');
@@ -149,7 +155,7 @@ exports.edit = function(app){
 	});
 
 	// The UI
-	app.get('/modules/edit', function(req, res){
+	app.get('/modules/edit', ensureAuthenticated, function(req, res){
 		if(typeof req.query.id != 'undefined'){
 			var module_id = req.query.id;
 			var module = Modules.getModuleById(module_id, function(err, module){
@@ -162,7 +168,7 @@ exports.edit = function(app){
 					for(var x in module.tags)
 						module_tags_parsed += module.tags[x] + ",";
 					if(module_tags_parsed !== "")
-						module_tags_parsed = module_tags_parsed.slice(0, -1);	
+						module_tags_parsed = module_tags_parsed.slice(0, -1);
 					res.render('modules/editModule', {'title': 'Edit this module', 'module': module, 'columns': JSON.stringify(module.results.columns), 'module_tags_parsed': module_tags_parsed});
 				}
 			});
@@ -174,8 +180,8 @@ exports.edit = function(app){
 
 	// Form
 	// Get the already existing document and update as required. Can also be used for changes.
-	app.post('/modules/edit', function(req, res){
-		Modules.find({'_id': req.body._id}, function(err, modules){//console.log(modules[0]);
+	app.post('/modules/edit', ensureAuthenticated, function(req, res){
+		Modules.find({'_id': req.body._id}, function(err, modules){
 			modules = modules.pop();
 			modules.results._type = req.body._results_type;
 			modules.results.columns = [];
@@ -185,7 +191,7 @@ exports.edit = function(app){
 					modules.results.columns.push(req.body['_cols_'+i]);
 				}
 			}
-		
+
 			var module_id = modules._id;
 			var newModule = modules.toObject();
 			newModule.name = req.body._name;
@@ -194,12 +200,12 @@ exports.edit = function(app){
 			newModule.test.userScript = req.body._userScript;
 			newModule.test.enum_data = req.body._enum_data;
 			newModule.results.columns = modules.results.columns;
-			
+
 			var tags = req.body._tags;
 			tags = tags.replace(/ /g,'');
 			tags = tags.split(',');
 			newModule.tags = tags;
-			
+
 			delete newModule._id;
 			Modules.findOneAndUpdate({'_id': modules._id}, newModule, {'upsert': true}, function(err, module){
 				if(err){
@@ -208,20 +214,20 @@ exports.edit = function(app){
 					res.redirect('/modules/?id='+ module._id);
 				}
 			});
-		});	
-	});	
+		});
+	});
 }
 
 
 exports.results = function(app){
 
 	// Can be Ajax
-	app.post('/modules/results/update', function(req, res){
+	app.post('/modules/results/update', ensureAuthenticated, function(req, res){
 		var module_id = req.body._module_id;
 		var results = {};
 		results.raw = req.body._results_raw;
 		var browser = {};
-		browser.rows = JSON.parse(req.body._rows);		
+		browser.rows = JSON.parse(req.body._rows);
 		browser.version = "";
 		var test = {};
 		test.state = 'COMPLETED'; //  COMPLETE
@@ -236,10 +242,10 @@ exports.results = function(app){
 				res.redirect('/modules/?id='+ result._id);
 			}
 		});
-	});	
-	
+	});
+
 	// Hackish to Update the stuff.
-	app.get('/update', function(req, res){
+	app.get('/update', ensureAuthenticated, function(req, res){
 		Modules.find({}, function(err, modules){
 			if(err){
 				console.log('There is some error populating the Modules List');
@@ -258,14 +264,14 @@ exports.results = function(app){
 						console.log('Great ! Populated the list of modules.');
 						if(typeof req.query.module != 'undefined'){
 							res.redirect('/modules/?id='+req.query.module);
-						} else {	
+						} else {
 							res.redirect('/');
 						}
-					}				
+					}
 				});
 			}
 		});
-	});		
+	});
 }
 
 
@@ -297,7 +303,7 @@ var getBrowserResults = function(module){
 		table_html += '</tbody></table></div>';
 		browser_results[browser_list[x]] = table_html;
 	}
-return browser_results;	
+return browser_results;
 }
 
 
@@ -306,15 +312,21 @@ return browser_results;
 exports.fork = function(app){
 
 	// The UI
-	app.get('/modules/fork', function(req, res){
+	app.get('/modules/fork', ensureAuthenticated, function(req, res){
 		if(typeof req.query.id != 'undefined'){
 			var module_id = req.query.id;
 			var module = Modules.getModuleById(module_id, function(err, module){
 				if(err){
-					res.render('misc/error', {'info': 'Fork you ! Apparently, the module is missing in our system. Cannot Fork now !'});
+					res.render('misc/error', {'info': 'Apparently, the module is missing in our system.'});
 					res.end();
 				} else {
-					res.render('modules/forkModule', {'title': 'Fork this module', 'module': module, 'columns': JSON.stringify(module.results.columns)});
+					var module_tags_parsed = "";
+					module = module.toObject();
+					for(var x in module.tags)
+						module_tags_parsed += module.tags[x] + ",";
+					if(module_tags_parsed !== "")
+						module_tags_parsed = module_tags_parsed.slice(0, -1);
+					res.render('modules/forkModule', {'title': 'Fork this module', 'module': module, 'columns': JSON.stringify(module.results.columns), 'module_tags_parsed': module_tags_parsed});
 				}
 			});
 		} else {
@@ -322,4 +334,4 @@ exports.fork = function(app){
 			res.end();
 		}
 	});
-}
+	}

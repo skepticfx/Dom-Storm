@@ -4,7 +4,7 @@
 
 <div class="container">
 
-<div class="jumbotron">
+<div class="jumbotron" >
 
 
 <center>
@@ -46,7 +46,7 @@
 </div>
 
 
-		<div>
+		<div  id="results-bar">
 		<input type="hidden" name="id" value="<%= module_id %>"/>
 		<center><a class="btn btn-primary" title="Run the Test now" onClick="window.open('/modules/run?id=<%= module_id %>')"><img src="/public/imgs/icons/run.png" /> Run this test now.</a></center>
 		</div>
@@ -54,8 +54,6 @@
 		<br/>
 
   <div class="column">
-
-
 
 	<div class="column">
 		<div class="panel panel-primary">
@@ -69,12 +67,12 @@
 				The last time this module was run, it ran in to an error. Please re-run the test to get some results. And yea, Good Luck with that.
 				<% } if(module_test.state == "COMPLETED"){%>
 				              <ul class="nav nav-pills">
-                <li class="active"><a class="browser_tabs" href="#" id="chrome_tab"><img src="/public/imgs/browser-logos/GOOGLE_CHROME.png"/> Chrome</a></li>
-                <li><a class="browser_tabs" href="#" id="firefox_tab"><img src="/public/imgs/browser-logos/MOZILLA_FIREFOX.png"/> Firefox</a></li>
-                <li><a class="browser_tabs" href="#" id="ie_tab"><img src="/public/imgs/browser-logos/INTERNET_EXPLORER.png"/> Internet Explorer</a></li>
-                <li><a class="browser_tabs" href="#" id="safari_tab"><img src="/public/imgs/browser-logos/SAFARI.png"/> Safari</a></li>
-                <li><a class="browser_tabs" href="#" id="opera_tab"><img src="/public/imgs/browser-logos/OPERA.png"/> Opera</a></li>
-                <li><a class="browser_tabs" href="#" id="others_tab"><img src="/public/imgs/browser-logos/OTHERS.png"/> Others</a></li>
+                <li class="active"><a class="browser_tabs" href="#results-bar" id="chrome_tab"><img src="/public/imgs/browser-logos/GOOGLE_CHROME.png"/> Chrome</a></li>
+                <li><a class="browser_tabs" href="#results-bar" id="firefox_tab"><img src="/public/imgs/browser-logos/MOZILLA_FIREFOX.png"/> Firefox</a></li>
+                <li><a class="browser_tabs" href="#results-bar" id="ie_tab"><img src="/public/imgs/browser-logos/INTERNET_EXPLORER.png"/> Internet Explorer</a></li>
+                <li><a class="browser_tabs" href="#results-bar" id="safari_tab"><img src="/public/imgs/browser-logos/SAFARI.png"/> Safari</a></li>
+                <li><a class="browser_tabs" href="#results-bar" id="opera_tab"><img src="/public/imgs/browser-logos/OPERA.png"/> Opera</a></li>
+                <li><a class="browser_tabs" href="#results-bar" id="others_tab"><img src="/public/imgs/browser-logos/OTHERS.png"/> Others</a></li>
 
 
                 <!--<li class="disabled"><a href="#">Disabled</a></li>
@@ -162,6 +160,7 @@ $(document).ready(function(){
 		$(this).parent().attr('class', 'active');
 		var browser_result = this.id.slice(0,-3);
 		$('#'+browser_result+'results').show();
+		$('#'+browser_result+'results').scrollIntoView(true);
 
 	});
 	$('#chrome_tab').click();
