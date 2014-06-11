@@ -5,6 +5,7 @@
 var modules = require(process.cwd()+'/controllers/modules.js');
 var helper = require(process.cwd()+'/controllers/helper.js');
 var auth = require(process.cwd()+'/controllers/auth.js');
+var datasets = require(process.cwd()+'/controllers/datasets.js');
 
 // All Local routing goes here.
 exports.set = function(app){
@@ -16,6 +17,10 @@ exports.set = function(app){
 		res.render('index', {'title': 'Home Page', 'authError': authError});
 	});
 
+app.get('/xss', function(req, res){
+
+  res.render('misc/404', {'title': 'XSS Tester', 'info': req.query.xss});
+});
 	// Modules
 	modules.create(app); // More specific routes comes first.
 	modules.index(app);
@@ -32,5 +37,8 @@ exports.set = function(app){
   // Auth Modules
   auth.index(app);
   auth.twitter(app);
+
+	// Dataset
+	datasets.index(app);
 
 };

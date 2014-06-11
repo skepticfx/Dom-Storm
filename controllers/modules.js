@@ -5,9 +5,12 @@ var Modules = require(process.cwd()+'/models/Modules.js').Modules;
 
 // test authentication
 function ensureAuthenticated(req, res, next) {
-	if (req.isAuthenticated()) { return next(); }
-		res.redirect('/?authError=1');
+	if (req.isAuthenticated()) {req.currentUser = req.user.handle; return next(); }
+	req.currentUser = 'Anonymous';
+	res.redirect('/?authError=1');
+	//return next();
 }
+
 
 // Loads the module home and individual modules
 exports.index = function(app){
@@ -27,9 +30,11 @@ exports.index = function(app){
 					'module_results': module.results,
 					'module_test': module.test,
 					'browsers': getBrowserResults(module),
+					'module_owner': module.owner || 'Anonymous',
 					'module': module.toObject()
 					};
 					res.render('modules/getModule', module_details);
+					res.end();
 				}
 			});
 		} else {
@@ -38,6 +43,7 @@ exports.index = function(app){
 					console.log('There is some error populating the Modules List');
 				} else {
 					res.render('modules/index', {'title': 'Modules', 'modules': modules});
+					res.end();
 				}
 			});
 		}
@@ -45,14 +51,16 @@ exports.index = function(app){
 }
 
 // Loads and runs the module test page from /models/core/modules_test/
+// Anyone can RUN a module to test it. No Auth required.
 exports.run = function(app){
 
-	app.get('/modules/run', ensureAuthenticated, function(req, res){
+	app.get('/modules/run', function(req, res){
 		if(typeof req.query.id != 'undefined'){
 			var module_id = req.query.id;
 			var module = Modules.getModuleById(module_id, function(err, module){
 				if(err){
 					res.render('misc/error', {'info': 'Oops ! The test module is missing.'});
+					res.end();
 				} else{
 					var module_details = {
 					'module_id': module._id,
@@ -65,16 +73,19 @@ exports.run = function(app){
 					switch(module_details.module_test._type){
 					case "ENUM_FUNCTION":
 					res.render('modules/runModule_enum_function', module_details);
+					res.end();
 					break;
 
 					default:
 					res.render('misc/error', {'info': 'The Test Type is not defined yet'});
+					res.end();
 					}
 				}
 			});
 		} else {
 			res.status(404);
 			res.render('misc/404', {'info': 'Missing module id.' });
+			res.end();
 		}
 	});
 
@@ -86,6 +97,7 @@ exports.create = function(app){
 	// The UI
 	app.get('/modules/create', ensureAuthenticated, function(req, res){
 		res.render('modules/createModule', {'title':'Create a new Module'});
+		res.end();
 	});
 
 	// Form
@@ -118,10 +130,12 @@ exports.create = function(app){
 		newModule.name = req.body._name;
 		newModule.description = req.body._desc;
 		newModule.tags = tags;
+		newModule.owner = req.user.handle || 'Anonymous';
 
 		Modules.add(newModule, function(err, module){
 			if(err){
 				res.render('misc/error', {'info': 'Something wrong happened, when we tried creating your new module.'});
+				res.end();
 			} else {
 				var Obj = {}
 				Obj.name = module.name;
@@ -144,8 +158,13 @@ exports.edit = function(app){
 					res.render('misc/error', {'info': 'Apparently, the module is missing in our system.'});
 					res.end();
 				} else {
-					module.remove();
-					res.redirect('/update');
+					if(module.owner == req.currentUser){
+						module.remove();
+						res.redirect('/');
+					} else {
+						res.render('misc/userError', {'info': 'You must be the owner of this module to delete it.'});
+						res.end();
+					}
 				}
 			});
 		} else {
@@ -163,13 +182,19 @@ exports.edit = function(app){
 					res.render('misc/error', {'info': 'Apparently, the module is missing in our system.'});
 					res.end();
 				} else {
-					var module_tags_parsed = "";
-					module = module.toObject();
-					for(var x in module.tags)
-						module_tags_parsed += module.tags[x] + ",";
-					if(module_tags_parsed !== "")
-						module_tags_parsed = module_tags_parsed.slice(0, -1);
-					res.render('modules/editModule', {'title': 'Edit this module', 'module': module, 'columns': JSON.stringify(module.results.columns), 'module_tags_parsed': module_tags_parsed});
+					if(module.owner != req.currentUser){
+						res.render('misc/userError', {'info': 'You must be the owner of this module to edit it. You can fork this module though !'});
+						res.end();
+					} else {
+						var module_tags_parsed = "";
+						module = module.toObject();
+						for(var x in module.tags)
+							module_tags_parsed += module.tags[x] + ",";
+						if(module_tags_parsed !== "")
+							module_tags_parsed = module_tags_parsed.slice(0, -1);
+						res.render('modules/editModule', {'title': 'Edit this module', 'module': module, 'columns': JSON.stringify(module.results.columns), 'module_tags_parsed': module_tags_parsed});
+						res.end();
+					}
 				}
 			});
 		} else {
@@ -183,37 +208,45 @@ exports.edit = function(app){
 	app.post('/modules/edit', ensureAuthenticated, function(req, res){
 		Modules.find({'_id': req.body._id}, function(err, modules){
 			modules = modules.pop();
-			modules.results._type = req.body._results_type;
-			modules.results.columns = [];
-			if(modules.results._type == 'SIMPLE_TABLE'){
-				var num_cols = req.body._num_cols;
-				for(var i=1;i <= num_cols; i++){
-					modules.results.columns.push(req.body['_cols_'+i]);
+			if(modules.owner != req.currentUser){
+				res.render('misc/userError', {'info': 'You must be the owner of this module to edit it. You can fork this module though !'+ modules.owner + req.currentUser});
+				res.end();
+			} else {
+				modules.results._type = req.body._results_type;
+				modules.results.columns = [];
+				if(modules.results._type == 'SIMPLE_TABLE'){
+					var num_cols = req.body._num_cols;
+					for(var i=1;i <= num_cols; i++){
+						modules.results.columns.push(req.body['_cols_'+i]);
+					}
 				}
+
+				var module_id = modules._id;
+				var newModule = modules.toObject();
+				newModule.name = req.body._name;
+				newModule.description = req.body._desc;
+				newModule.test._type = req.body._module_type;
+				newModule.test.userScript = req.body._userScript;
+				newModule.test.enum_data = req.body._enum_data;
+				newModule.results.columns = modules.results.columns;
+
+				var tags = req.body._tags;
+				tags = tags.replace(/ /g,'');
+				tags = tags.split(',');
+				newModule.tags = tags;
+
+				newModule.owner = req.currentUser;
+
+				delete newModule._id;
+				Modules.findOneAndUpdate({'_id': modules._id}, newModule, {'upsert': true}, function(err, module){
+					if(err){
+						res.render('misc/error', {'info': err+'Something wrong happened, when we tried editing your module.'});
+						res.end();
+					} else {
+						res.redirect('/modules/?id='+ module._id);
+					}
+				});
 			}
-
-			var module_id = modules._id;
-			var newModule = modules.toObject();
-			newModule.name = req.body._name;
-			newModule.description = req.body._desc;
-			newModule.test._type = req.body._module_type;
-			newModule.test.userScript = req.body._userScript;
-			newModule.test.enum_data = req.body._enum_data;
-			newModule.results.columns = modules.results.columns;
-
-			var tags = req.body._tags;
-			tags = tags.replace(/ /g,'');
-			tags = tags.split(',');
-			newModule.tags = tags;
-
-			delete newModule._id;
-			Modules.findOneAndUpdate({'_id': modules._id}, newModule, {'upsert': true}, function(err, module){
-				if(err){
-					res.render('misc/error', {'info': err+'Something wrong happened, when we tried creating your new module.'});
-				} else {
-					res.redirect('/modules/?id='+ module._id);
-				}
-			});
 		});
 	});
 }
@@ -222,7 +255,7 @@ exports.edit = function(app){
 exports.results = function(app){
 
 	// Can be Ajax
-	app.post('/modules/results/update', ensureAuthenticated, function(req, res){
+	app.post('/modules/results/update', function(req, res){
 		var module_id = req.body._module_id;
 		var results = {};
 		results.raw = req.body._results_raw;
@@ -238,6 +271,7 @@ exports.results = function(app){
 		Modules.findOneAndUpdate({'_id': module_id}, updateObj,  function(err, result){
 			if(err){
 				res.render('misc/error', {'info': 'Something wrong happened, when we tried creating your new module.'});
+				res.end();
 			} else {
 				res.redirect('/modules/?id='+ result._id);
 			}
@@ -253,7 +287,7 @@ exports.results = function(app){
 				var modulesList = [];
 				for(x in modules){
 					var obj = {};
-					obj.name = modules[x].name;
+					obj.name = encode(modules[x].name);
 					obj.id = modules[x]._id;
 					modulesList.push(obj);
 				}
@@ -327,6 +361,7 @@ exports.fork = function(app){
 					if(module_tags_parsed !== "")
 						module_tags_parsed = module_tags_parsed.slice(0, -1);
 					res.render('modules/forkModule', {'title': 'Fork this module', 'module': module, 'columns': JSON.stringify(module.results.columns), 'module_tags_parsed': module_tags_parsed});
+					res.end();
 				}
 			});
 		} else {
@@ -334,4 +369,12 @@ exports.fork = function(app){
 			res.end();
 		}
 	});
-	}
+}
+
+
+function encode(str){
+	str = str.replace(/</gi, '&lt;');
+	str = str.replace(/>/gi, '&gt;');
+	str = str.replace(/"/gi, '&quot;');
+return str;
+}
