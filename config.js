@@ -11,3 +11,4 @@ if(process.env.OPENSHIFT_MONGODB_DB_URL){
 }
 config.TWITTER_CONSUMER_KEY = "";
 config.TWITTER_CONSUMER_SECRET = "";
+config.admin = ''; // Twitter Username of the Admin account.

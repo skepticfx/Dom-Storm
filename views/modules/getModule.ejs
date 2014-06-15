@@ -8,111 +8,96 @@
 
 
 <center>
-			<h1><%= module_name %></h1> <span class="label">By <%= module_owner %></span>
+			<h1><%= module_name %></h1>
 			<p><h5><%= module_description %></h5></p>
+ 		 <div id='items-title'>By </div><a href="/profile/<%= module_owner %>/" class='tags-link'><span class="tags-link-span label label-user"><%= module_owner %></span></a>
+			<span id='fav_count' class='label label-favs'> <img src="/public/imgs/icons/favs_small-red.png"> <%= module_favs %></span>
+			<br/>
+			<div id='items-title'>Tags</div>
 			<% for(tags in module.tags){ %>
-			<span class="label label-danger"><%= module.tags[tags] %></span>
+			<a href="/search?q=[tags]:<%= module.tags[tags]%>" class='tags-link'><span class="tags-link-span label label-tags"><%= module.tags[tags] %></span></a>
 			<% } %>
 <br/>
-<div id="div-favorite" style="display: inline">
-	<form id="favorite-module" action="/modules/favorite" method="POST" style="display: inline">
-	<input type="hidden" name="id" value="<%= module_id %>"/>
-	<a class="btn btn-info" title="Favorite this module" onClick="document.getElementById('favorite-module').submit();"><img src="/public/imgs/icons/favorite.png" /></a>
-	</form>
-</div>
+<% if(userOptions.status == "enabled"){ %>
 
-<div id="div-fork" style="display: inline">
-	<form id="fork-module" action="/modules/fork" method="GET" style="display: inline">
-	<input type="hidden" name="id" value="<%= module_id %>"/>
-	<a class="btn btn-warning" title="Fork this module" onClick="document.getElementById('fork-module').submit();"><img src="/public/imgs/icons/fork.png"/></a>
-	</form>
-</div>
-
-<div id="div-edit" style="display: inline">
-	<form id="edit-module" action="/modules/edit" method="GET" style="display: inline">
-	<input type="hidden" name="id" value="<%= module_id %>"/>
-	<a class="btn btn-success" title="Edit this module" onClick="document.getElementById('edit-module').submit();"><img src="/public/imgs/icons/edit.png" /></a>
-	</form>
-</div>
-
-<div id="div-delete" style="display: inline">
-	<form id="delete-module" action="/modules/delete" method="POST" style="display: inline">
-	<input type="hidden" name="_id" value="<%= module_id %>"/>
-	<a class="btn btn-danger" title="Delete this module" onClick="ans = confirm('Are you sure you want to delete this module?'); if(ans)document.getElementById('delete-module').submit(); return;"><img src="/public/imgs/icons/delete.png"/></a>
-	</form>
-</div>
-</center>
-
-</div>
-
-
-		<div  id="results-bar">
-		<input type="hidden" name="id" value="<%= module_id %>"/>
-		<center><a class="btn btn-primary" title="Run the Test now" onClick="window.open('/modules/run?id=<%= module_id %>')"><img src="/public/imgs/icons/run.png" /> Run this test now.</a></center>
+	<% if(userOptions.showFav){ %>
+		<div id="div-favorite" style="display: inline">
+			<form id="favorite-module" action="/modules/favorite" method="POST" style="display: inline">
+			<input type="hidden" name="id" value="<%= module_id %>"/>
+			<a class="btn btn-info" title="Favorite this module" onClick="document.getElementById('favorite-module').submit();"><img src="/public/imgs/icons/favorite.png" /></a>
+			</form>
 		</div>
+	<% } %>
 
-		<br/>
+	<div id="div-fork" style="display: inline">
+		<form id="fork-module" action="/modules/fork" method="GET" style="display: inline">
+		<input type="hidden" name="id" value="<%= module_id %>"/>
+		<a class="btn btn-warning" title="Fork this module" onClick="document.getElementById('fork-module').submit();"><img src="/public/imgs/icons/fork.png"/></a>
+		</form>
+	</div>
 
-  <div class="column">
+	<% if(userOptions.owner){ %>
+		<div id="div-edit" style="display: inline">
+			<form id="edit-module" action="/modules/edit" method="GET" style="display: inline">
+			<input type="hidden" name="id" value="<%= module_id %>"/>
+			<a class="btn btn-success" title="Edit this module" onClick="document.getElementById('edit-module').submit();"><img src="/public/imgs/icons/edit.png" /></a>
+			</form>
+		</div>
+	<% } %>
 
-	<div class="column">
-		<div class="panel panel-primary">
-			<div class="panel-heading">
-				<h3 class="panel-title"><img src="/public/imgs/icons/results.png"/> Results</h3>
-			</div>
-			<div class="panel-body">
-				<% if(module_test.state == "NOT_STARTED"){ %>
-				This module appears to be new to the system. Please run the test, to view the results.
-				<% } if(module_test.state == "ERROR"){ %>
-				The last time this module was run, it ran in to an error. Please re-run the test to get some results. And yea, Good Luck with that.
-				<% } if(module_test.state == "COMPLETED"){%>
-				              <ul class="nav nav-pills">
-                <li class="active"><a class="browser_tabs" href="#results-bar" id="chrome_tab"><img src="/public/imgs/browser-logos/GOOGLE_CHROME.png"/> Chrome</a></li>
-                <li><a class="browser_tabs" href="#results-bar" id="firefox_tab"><img src="/public/imgs/browser-logos/MOZILLA_FIREFOX.png"/> Firefox</a></li>
-                <li><a class="browser_tabs" href="#results-bar" id="ie_tab"><img src="/public/imgs/browser-logos/INTERNET_EXPLORER.png"/> Internet Explorer</a></li>
-                <li><a class="browser_tabs" href="#results-bar" id="safari_tab"><img src="/public/imgs/browser-logos/SAFARI.png"/> Safari</a></li>
-                <li><a class="browser_tabs" href="#results-bar" id="opera_tab"><img src="/public/imgs/browser-logos/OPERA.png"/> Opera</a></li>
-                <li><a class="browser_tabs" href="#results-bar" id="others_tab"><img src="/public/imgs/browser-logos/OTHERS.png"/> Others</a></li>
+	<% if(userOptions.owner){ %>
+		<div id="div-delete" style="display: inline">
+			<form id="delete-module" action="/modules/delete" method="POST" style="display: inline">
+			<input type="hidden" name="_id" value="<%= module_id %>"/>
+			<a class="btn btn-danger" title="Delete this module" onClick="ans = confirm('Are you sure you want to delete this module?'); if(ans)document.getElementById('delete-module').submit(); return;"><img src="/public/imgs/icons/delete.png"/></a>
+			</form>
+		</div>
+	<% } %>
 
+<% } %>
 
-                <!--<li class="disabled"><a href="#">Disabled</a></li>
-                <li class="dropdown">
-                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    Dropdown <span class="caret"></span>
-                  </a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#">Action</a></li>
-                    <li><a href="#">Another action</a></li>
-                    <li><a href="#">Something else here</a></li>
-                    <li class="divider"></li>
-                    <li><a href="#">Separated link</a></li>
-                  </ul>
-                </li> -->
-              </ul>
-			  <div id="chrome_results" class="browser_results">
-			  <%- browsers.GOOGLE_CHROME %>
-			  </div>
-			  <div id="firefox_results" class="browser_results">
-			  <%- browsers.MOZILLA_FIREFOX %>
-			  </div>
-			  <div id="ie_results" class="browser_results">
-			  <%- browsers.INTERNET_EXPLORER %>
-			  </div>
-			  <div id="opera_results" class="browser_results">
-			  <%- browsers.OPERA %>
-			  </div>
-			  <div id="safari_results" class="browser_results">
-			  <%- browsers.SAFARI %>
-			  </div>
-			  <div id="others_results" class="browser_results">
-			  <%- browsers.OTHERS %>
-			  </div>
-			  <% } %>
+</center>
+</div>
 
 
-			</div>
+<div id="results-bar">
+	<input type="hidden" name="id" value="<%= module_id %>"/>
+	<center><a class="btn btn-primary" id='run-test-href' title="Run the Test now" onClick="window.open('/modules/run?id=<%= module_id %>')"><img src="/public/imgs/icons/run.png" /> Run this test now.</a></center>
+</div>
+
+<br/>
+
+<div class="column">
+
+<div class="column">
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+			<h3 class="panel-title"><img src="/public/imgs/icons/results.png"/> Results</h3>
+		</div>
+		<div class="panel-body">
+		<% if(module_test.state == "NOT_STARTED"){ %>
+			This module appears to be new to the system. Please run the test, to view the results.
+			<% } if(module_test.state == "ERROR"){ %>
+			The last time this module was run, it ran in to an error. Please re-run the test to get some results.
+			<% } if(module_test.state == "COMPLETED"){ %>
+				<ul class="nav nav-pills">
+				<% for(var x in browsers){ %>
+					<li style="cursor: pointer;">
+						<a class="browser_tabs" id="<%= x.trim().replace(/ /gi, '').toLowerCase() %>">
+							<img src="/public/imgs/browser-logos/<%= x.trim().replace(/ /gi, '').toLowerCase() %>.png"/> <%= x %>
+						</a>
+					</li>
+				<% } %>
+				</ul>
+				<% for(var x in browsers) { %>
+					<div id="<%= x.trim().replace(/ /gi, '').toLowerCase() %>_results" class="browser_results">
+						<%- browsers[x] %>
+					</div>
+				<% } %>
+		<% } %>
 		</div>
 	</div>
+</div>
 
 	<div class="column">
 		<div class="panel panel-primary">
@@ -153,15 +138,24 @@
 
 <script>
 $(document).ready(function(){
+	<% if(userOptions.blinkFav) { %>
+	$('#fav_count').fadeOut(500);
+	$('#fav_count').fadeIn(1000);
+	<% } %>
+
+	// Highlight the fist browser tab and show only the results for that.
+	$('.browser_tabs').parent()[0].setAttribute('class', 'active');
 	$('.browser_results').hide();
+	$('.browser_results')[0].style.display = 'block';
+
 	$('.browser_tabs').click(function(){
+		$('#results-bar').scrollTop();
 		$('.browser_results').hide();
 		$('.browser_tabs').parent().attr('class', '');
 		$(this).parent().attr('class', 'active');
-		var browser_result = this.id.slice(0,-3);
-		$('#'+browser_result+'results').show();
+		var browser_result = this.id;
+		$('#'+browser_result+'_results').show();
 	});
-	$('#chrome_tab').click();
 });
 
 </script>

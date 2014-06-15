@@ -2,20 +2,42 @@
 
 var fs = require('fs');
 var Modules = require(process.cwd()+'/models/Modules.js').Modules;
+var admin = require('../config.js').config.admin;
 
-// test authentication
-function ensureAuthenticated(req, res, next) {
-	if (req.isAuthenticated()) {req.currentUser = req.user.handle; return next(); }
-	req.currentUser = 'Anonymous';
-	res.redirect('/?authError=1');
-	//return next();
+function ensureAdmin(req, res, next) {
+
+	if (req.isAuthenticated() && req.user.handle === admin) {
+		return next();
+	} else {
+		res.render('misc/userError', {info: 'You must be an Admin to do this action.'});
+		res.end();
+	}
 }
 
+// Auth Middleware and sets the logged in user to req.currentUser;
+function ensureAuthenticated(req, res, next) {
+
+	if (req.isAuthenticated()) {
+		req.currentUser = req.user.handle;
+		return next();
+	}
+	req.currentUser = 'Anonymous';
+	res.redirect('/?authError=1');
+}
+
+function populateUser(req, res, next){
+	if(req.isAuthenticated()){
+		req.currentUser = req.user.handle;
+	} else {
+		req.currentUser = 'Anonymous';
+	}
+return next();
+}
 
 // Loads the module home and individual modules
 exports.index = function(app){
 
-	app.get('/modules', function(req, res){
+	app.get('/modules', populateUser, function(req, res){
 		if(typeof req.query.id != 'undefined'){
 			var module_id = req.query.id;
 			var module = Modules.getModuleById(module_id, function(err, module){
@@ -23,6 +45,27 @@ exports.index = function(app){
 					res.render('misc/error', {'info': 'Apparently, the module is missing in our system.'});
 					res.end();
 				} else {
+
+					var userOptions = {};
+					userOptions.blinkFav = false;
+					if(req.query && req.query.info && req.query.info === 'fav_success')
+						userOptions.blinkFav = true;
+
+					userOptions.owner = false;
+					if(module.owner == req.currentUser || req.currentUser == admin)
+						userOptions.owner = true;
+
+					if(req.currentUser !== 'Anonymous'){
+						userOptions.status = 'enabled';
+						userOptions.showFav = true;
+						if(module.favs)
+							if(module.favs.indexOf(req.currentUser) >= 0)
+								userOptions.showFav = false;
+
+					} else {
+						userOptions.status ='disabled';
+					}
+
 					var module_details = {
 					'module_id': module._id,
 					'module_name': module.name,
@@ -31,6 +74,8 @@ exports.index = function(app){
 					'module_test': module.test,
 					'browsers': getBrowserResults(module),
 					'module_owner': module.owner || 'Anonymous',
+					'userOptions': userOptions,
+					'module_favs': (module.favs && module.favs.length) || 0,
 					'module': module.toObject()
 					};
 					res.render('modules/getModule', module_details);
@@ -158,7 +203,7 @@ exports.edit = function(app){
 					res.render('misc/error', {'info': 'Apparently, the module is missing in our system.'});
 					res.end();
 				} else {
-					if(module.owner == req.currentUser){
+					if(module.owner == req.currentUser || req.currentUser == admin){
 						module.remove();
 						res.redirect('/');
 					} else {
@@ -182,7 +227,7 @@ exports.edit = function(app){
 					res.render('misc/error', {'info': 'Apparently, the module is missing in our system.'});
 					res.end();
 				} else {
-					if(module.owner != req.currentUser){
+					if(module.owner != req.currentUser  && req.currentUser != admin){
 						res.render('misc/userError', {'info': 'You must be the owner of this module to edit it. You can fork this module though !'});
 						res.end();
 					} else {
@@ -208,7 +253,7 @@ exports.edit = function(app){
 	app.post('/modules/edit', ensureAuthenticated, function(req, res){
 		Modules.find({'_id': req.body._id}, function(err, modules){
 			modules = modules.pop();
-			if(modules.owner != req.currentUser){
+			if(modules.owner != req.currentUser && req.currentUser != admin){
 				res.render('misc/userError', {'info': 'You must be the owner of this module to edit it. You can fork this module though !'+ modules.owner + req.currentUser});
 				res.end();
 			} else {
@@ -235,7 +280,8 @@ exports.edit = function(app){
 				tags = tags.split(',');
 				newModule.tags = tags;
 
-				newModule.owner = req.currentUser;
+				// The old owner should be the owner always !
+				// DO NOT CHANGE modules.owner
 
 				delete newModule._id;
 				Modules.findOneAndUpdate({'_id': modules._id}, newModule, {'upsert': true}, function(err, module){
@@ -257,11 +303,11 @@ exports.results = function(app){
 	// Can be Ajax
 	app.post('/modules/results/update', function(req, res){
 		var module_id = req.body._module_id;
-		var results = {};
-		results.raw = req.body._results_raw;
 		var browser = {};
+		browser.name = req.body._browser;
 		browser.rows = JSON.parse(req.body._rows);
-		browser.version = "";
+		browser.version = req.body._version;
+		browser.os = req.body._os;
 		var test = {};
 		test.state = 'COMPLETED'; //  COMPLETE
 		var updateObj = {};
@@ -270,7 +316,7 @@ exports.results = function(app){
 
 		Modules.findOneAndUpdate({'_id': module_id}, updateObj,  function(err, result){
 			if(err){
-				res.render('misc/error', {'info': 'Something wrong happened, when we tried creating your new module.'});
+				res.render('misc/error', {'info': 'Something wrong happened, when we tried updating the results'});
 				res.end();
 			} else {
 				res.redirect('/modules/?id='+ result._id);
@@ -309,37 +355,36 @@ exports.results = function(app){
 }
 
 
-// Supporting Functions, Don't know where the hell to put this in the MVC stuff :( Any suggestions?
 var getBrowserResults = function(module){
-	var browser_results = {};
 
-	var browser_list = ['GOOGLE_CHROME', 'MOZILLA_FIREFOX', 'OPERA', 'SAFARI', 'INTERNET_EXPLORER', 'OTHERS'];
-	for(var x in browser_list){
-		var browser_temp = module.results.browsers[browser_list[x]];
-		if(browser_temp.rows.length == 0){
-			browser_results[browser_list[x]] = "<h4> This module was never tested on this browser. Why don't you contribute? </h4>";
-			continue;
-		}
-		var table_html = '<div class="bs-example table-responsive"><table class="table table-striped table-bordered table-hover"> <thead><tr class="TITLE">';
-		// Iterate the columns
-		for(var i=0; i<module.results.columns.length; i++){
-			table_html += '<th>'+ module.results.columns[i] +'</th>'
-		}
-		table_html += '</tr></thead><tbody>';
-		// Iterate the Rows, PS: Its a 2D array
-		for(i=0; i<browser_temp.rows.length; i++){
-			table_html += '<tr class="'+browser_temp.rows[i].type+'">';
-			for(j=0; j<browser_temp.rows[i].data.length; j++){
-				table_html += '<td>'+ browser_temp.rows[i].data[j] +'</td>';
+	var browser_results = {};
+	var browsers = module.results.browsers;
+	for(var x in browsers){
+		var browser_temp = browsers[x];
+		if(browser_temp.rows && browser_temp.rows.length > 0){
+			if(browser_temp.name === undefined || browser_temp.name === '')	browser_temp.name = 'Unknown Browser';
+			if(browser_temp.version === undefined || browser_temp.version === '')	browser_temp.version = 'Unknown Version';
+			if(browser_temp.os === undefined || browser_temp.os === '')	browser_temp.os = 'Unknown OS';
+			var table_html = '<br/><div class="table-responsive"><div class="label label-danger">Tested on</div><div class="label label-info">'+browser_temp.name +' - '+ browser_temp.version+' - '+ browser_temp.os+'</div><table class="table table-striped table-bordered table-hover"> <thead><tr class="TITLE">';
+			// Iterate the columns
+			for(var i=0; i<module.results.columns.length; i++){
+				table_html += '<th>'+ module.results.columns[i] +'</th>'
 			}
-			table_html += '</tr>';
+			table_html += '</tr></thead><tbody>';
+			// Iterate the Rows, PS: Its a 2D array
+			for(i=0; i<browser_temp.rows.length; i++){
+				table_html += '<tr class="'+browser_temp.rows[i].type+'">';
+				for(j=0; j<browser_temp.rows[i].data.length; j++){
+					table_html += '<td>'+ browser_temp.rows[i].data[j] +'</td>';
+				}
+				table_html += '</tr>';
+			}
+			table_html += '</tbody></table></div>';
+			browser_results[browser_temp.name] = table_html;
 		}
-		table_html += '</tbody></table></div>';
-		browser_results[browser_list[x]] = table_html;
 	}
 return browser_results;
 }
-
 
 
 // Forks a new module
@@ -370,6 +415,40 @@ exports.fork = function(app){
 		}
 	});
 }
+
+// Favorites a given module by a logged in User.
+exports.favorite = function(app){
+
+	// The UI
+	app.post('/modules/favorite', ensureAuthenticated, function(req, res){
+		if(typeof req.body.id != 'undefined'){
+			var module_id = req.body.id;
+			var module = Modules.getModuleById(module_id, function(err, module){
+				if(err){
+					res.render('misc/error', {'info': 'Apparently, the module is missing in our system.'});
+					res.end();
+				} else {
+					module = module.toObject();
+					module.favs.push(req.currentUser);
+					var id = module._id;
+					delete module._id;
+					Modules.findOneAndUpdate({'_id': id}, module, function(err, module){
+						if(err){
+							res.render('misc/error', {'info': err+'Something wrong happened, when we tried favoriting this module.'});
+							res.end();
+						} else {
+							res.redirect('/modules/?id='+ module._id+'&info=fav_success');
+						}
+					});
+				}
+			});
+		} else {
+			res.render('misc/error', {'info': 'Apparently, the module is missing in our system.'});
+			res.end();
+		}
+	});
+}
+
 
 
 function encode(str){
