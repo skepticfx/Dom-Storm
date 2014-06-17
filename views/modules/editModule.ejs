@@ -4,12 +4,12 @@
 <style>
 #userScript{
     width: 100%;
-    height: 400px;
+    height: 300px;
 }
 
 #enum_data{
     width: 100%;
-    height: 100px;
+    height: 300px;
 }
 
 </style>
@@ -48,21 +48,45 @@
 	  <div class="form-group">
 		<label class="col-lg-2 control-label">Module Type</label>
 		<div class="col-lg-10">
-		  <div class="radio">
-			<label>
-			  <input type="radio" name="_module_type" id="optionsRadios1" value="ENUM_FUNCTION" checked="">
-			  Enumeration Functions
-			</label>
-		  </div>
-		  <div class="radio">
-			<label>
-			  <input disabled type="radio" name="_module_type" id="optionsRadios2" value="FUZZER">
-			  Fuzzer
-			</label>
-		  </div>
+      <div class="radio">
+      <label>
+
+        <input type="radio" name="_module_type" id="optionsRadios1" value="<%= module.test._type%>" checked="">
+        <% if(module.test._type === 'ENUM_FUNCTION') {%>
+         Enumeration Function
+        <% } %>
+        <% if(module.test._type === 'TESTHARNESS') {%>
+         W3C Test Harness
+        <% } %>
+        <% if(module.test._type === 'FUZZER') {%>
+         Fuzzer
+        <% } %>
+      </label>
+      </div>
+
 		</div>
 	  </div>
 
+<script>
+  $(document).ready(function(){ 
+    $('.enum_stuff').hide();
+    <% if(module.test._type === 'ENUM_FUNCTION') {%>
+      $('.enum_stuff').show();
+    <% } %>
+    $('#optionsRadios1').change(function(){
+      $('.enum_stuff').hide();
+    });
+
+    $('#optionsRadios2').change(function(){
+      $('.enum_stuff').show();
+    });
+
+    $('#optionsRadios3').change(function(){
+      alert('Not supported yet');
+    });
+  });
+</script>
+  <div class='enum_stuff'>
 	  <div class="form-group">
 		<label class="col-lg-2 control-label">Results Type</label>
 		<div class="col-lg-10">
@@ -82,7 +106,6 @@
 	  </div>
 
 <!-- Column Names et al -->
-
 	  <div id="greenish_title">Customize your column names</div>
 	  <div class="form-group">
 		<label for="num_cols" class="col-lg-2 control-label">Number of Columns</label>
@@ -94,17 +117,19 @@
 	<div id="div_cols" class="form-group">
 
 	</div>
+</div>
 <!-- End of columns names et al -->
 
     <div id="greenish_title">Test scripts</div>
 	  <div class="form-group">
 		<label for="userScript" class="col-lg-2 control-label">User Script</label>
 		<div class="col-lg-10">
-		  <pre class="form-control" id="userScript"><%= module.test.userScript%></pre>
+		  <div class="form-control" id="userScript"><%= module.test.userScript%></div>
 		  <span class="help-block">Come up with your own script to do a Enumeration Function scan. Read more <u>here</u></span>
 		</div>
 	  </div>
 
+  <div class='enum_stuff'>
 	  <div class="form-group">
 		<label for="enum_data" class="col-lg-2 control-label">Enumeration Data</label>
 		<div class="col-lg-10">
@@ -116,6 +141,7 @@
 		  </span>
 		</div>
 	  </div>
+  </div>
 		<input type="hidden" name="_userScript" id="_userScript" value="" />
 		<input type="hidden" name="_enum_data" id="_enum_data" value="" />
 
@@ -128,47 +154,47 @@
 </div>
 </div>
 
-</body>
 <script>
-var userScript = ace.edit("userScript");
-userScript.setTheme("ace/theme/github");
-userScript.getSession().setMode("ace/mode/javascript");
-
-var enum_data = ace.edit("enum_data");
-enum_data.setTheme("ace/theme/github");
-enum_data.getSession().setMode("ace/mode/javascript");
 $(document).ready(function() {
+  var userScript = ace.edit("userScript");
+  userScript.setTheme("ace/theme/chrome");
+  userScript.getSession().setMode("ace/mode/html");
 
-		updateColumns($('#num_cols').val());
-		$('#num_cols').keyup(function(){
-			if(this.value>=1 && this.value<=5)
-				updateColumns(this.value);
-			else{
-				if(this.value != "")
-					this.value = 1;
-				updateColumns(1);
-			}
-		});
+  var enum_data = ace.edit("enum_data");
+  enum_data.setTheme("ace/theme/chrome");
+  enum_data.getSession().setMode("ace/mode/html");
 
-		$('#submitButton').click(function(){
-			$('#_userScript').val(userScript.getValue());
-			$('#_enum_data').val(enum_data.getValue());
-			$('#editModule').submit();
-		});
+
+	updateColumns($('#num_cols').val());
+	$('#num_cols').keyup(function(){
+		if(this.value>=1 && this.value<=5)
+			updateColumns(this.value);
+		else{
+			if(this.value != "")
+				this.value = 1;
+			updateColumns(1);
+		}
 	});
 
+	$('#submitButton').click(function(){
+		$('#_userScript').val(userScript.getValue());
+		$('#_enum_data').val(enum_data.getValue());
+		$('#editModule').submit();
+	});
+});
+
 var updateColumns = function(num){
-	$('#div_cols').empty();
-	for(var i=1; i<=num; i++){
-		$('#div_cols').append('<label for="_cols_'+i+'" class="col-lg-2 control-label">Column '+i+'</label><div class="col-lg-4"><input type="text" name="_cols_'+i+'" class="form-control" id="cols_'+i+'" placeholder="'+getColumnName(i)+'" value="'+getColumnName(i)+'" autocomplete="off"></div>');
-	}
+  $('#div_cols').empty();
+  for(var i=1; i<=num; i++){
+    $('#div_cols').append('<label for="_cols_'+i+'" class="col-lg-2 control-label">Column '+i+'</label><div class="col-lg-4"><input type="text" name="_cols_'+i+'" class="form-control" id="cols_'+i+'" placeholder="'+getColumnName(i)+'" value="'+getColumnName(i)+'" autocomplete="off"></div>');
+  }
 }
 
 var column_names = <%- columns %>;
-
 var getColumnName = function(i){
-return column_names[i-1] || '';
+  return column_names[i-1] || '';
 }
+
 </script>
 
 <% include ../layouts/footer.ejs %>

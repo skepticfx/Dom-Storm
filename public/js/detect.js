@@ -6,7 +6,7 @@
  * @version 2.2.1
  * @author Darcy Clarke
  * @url http://darcyclarke.me
- * @createdat Sat Jun 14 2014 19:52:48 GMT+0530 (IST)
+ * @createdat Mon Jun 16 2014 14:05:56 GMT+0530 (IST)
  *
  * Based on UA-Parser (https://github.com/tobie/ua-parser) by Tobie Langel
  *
