@@ -2,6 +2,8 @@
 
 ### A dashboard for interesting DOM tricks/techniques.
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5746f2f6d1d04e71bf36651804b1fab7)](https://www.codacy.com/app/skepticfx/domstorm?utm_source=github.com&utm_medium=referral&utm_content=skepticfx/domstorm&utm_campaign=badger)
+
 ### Try https://domstorm.skepticfx.com
 
 #### Installation
